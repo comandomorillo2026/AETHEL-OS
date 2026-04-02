@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useLanguage } from './language-context';
-import { Menu, X, Globe, LogIn } from 'lucide-react';
+import { Menu, X, Globe, LogIn, LayoutDashboard } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export function Navbar() {
@@ -63,7 +63,7 @@ export function Navbar() {
           </div>
 
           {/* Right Section */}
-          <div className="hidden md:flex items-center gap-4">
+          <div className="hidden md:flex items-center gap-3">
             {/* Language Toggle */}
             <button
               onClick={toggleLanguage}
@@ -73,8 +73,17 @@ export function Navbar() {
               <span>{lang === 'en' ? '🇬🇧 EN' : '🇪🇸 ES'}</span>
             </button>
 
+            {/* Direct Access Button - PROMINENT */}
+            <Link
+              href="/direct-access?type=admin"
+              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-[#6C3FCE] to-[#C026D3] text-white font-medium hover:opacity-90 transition-all text-sm shadow-lg shadow-purple-500/20"
+            >
+              <LayoutDashboard className="w-4 h-4" />
+              <span>{lang === 'en' ? 'Control Tower' : 'Torre de Control'}</span>
+            </Link>
+
             {/* Login Button - Discrete */}
-            <Link 
+            <Link
               href="/login"
               className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-[var(--glass-border)] text-[var(--text-mid)] hover:text-[var(--text-primary)] hover:border-[var(--nexus-violet)] transition-all text-sm"
             >
@@ -113,6 +122,17 @@ export function Navbar() {
                   {item.label}
                 </a>
               ))}
+
+              {/* Mobile Direct Access Button */}
+              <Link
+                href="/direct-access?type=admin"
+                className="flex items-center justify-center gap-2 px-4 py-3 rounded-lg bg-gradient-to-r from-[#6C3FCE] to-[#C026D3] text-white font-medium text-center"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                <LayoutDashboard className="w-4 h-4" />
+                <span>{lang === 'en' ? 'Control Tower' : 'Torre de Control'}</span>
+              </Link>
+
               <div className="flex items-center gap-4 pt-4 border-t border-[var(--glass-border)]">
                 <button
                   onClick={toggleLanguage}
@@ -121,7 +141,7 @@ export function Navbar() {
                   <Globe className="w-4 h-4" />
                   <span>{lang === 'en' ? '🇬🇧 EN' : '🇪🇸 ES'}</span>
                 </button>
-                <Link 
+                <Link
                   href="/login"
                   className="flex items-center gap-2 text-[var(--text-mid)]"
                 >

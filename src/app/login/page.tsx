@@ -1,13 +1,12 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '@/lib/auth';
+import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { Shield, Mail, Lock, Eye, EyeOff, AlertCircle, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 
 function LoginForm() {
-  const { login, isLoading } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -28,20 +27,45 @@ function LoginForm() {
     console.log('[LOGIN] Submitting form with email:', email);
 
     try {
-      const result = await login(email, password);
+      // Use NextAuth signIn directly
+      const result = await signIn('credentials', {
+        email,
+        password,
+        redirect: false,
+      });
 
-      console.log('[LOGIN] Login result:', result);
+      console.log('[LOGIN] SignIn result:', result);
 
-      if (result.success) {
-        console.log('[LOGIN] Success! Redirecting to:', result.redirectPath);
-        // Small delay to ensure session is updated
-        setTimeout(() => {
-          router.push(result.redirectPath || '/admin');
-          router.refresh();
-        }, 100);
+      if (result?.error) {
+        console.log('[LOGIN] Error:', result.error);
+        setError('Credenciales inválidas. Por favor verifica tu email y contraseña.');
       } else {
-        console.log('[LOGIN] Failed:', result.error);
-        setError(result.error || 'Credenciales inválidas. Por favor verifica tu email y contraseña.');
+        console.log('[LOGIN] Success! Redirecting...');
+        // Determine redirect based on email
+        let redirectPath = '/admin';
+        if (email.toLowerCase().includes('clinic')) {
+          redirectPath = '/clinic';
+        } else if (email.toLowerCase().includes('lawfirm')) {
+          redirectPath = '/lawfirm';
+        } else if (email.toLowerCase().includes('beauty')) {
+          redirectPath = '/beauty';
+        } else if (email.toLowerCase().includes('nurse')) {
+          redirectPath = '/nurse';
+        } else if (email.toLowerCase().includes('bakery')) {
+          redirectPath = '/bakery';
+        } else if (email.toLowerCase().includes('pharmacy')) {
+          redirectPath = '/pharmacy';
+        } else if (email.toLowerCase().includes('insurance')) {
+          redirectPath = '/insurance';
+        } else if (email.toLowerCase() === 'admin@nexusos.tt') {
+          redirectPath = '/admin';
+        }
+
+        // Small delay to ensure session is set
+        setTimeout(() => {
+          router.push(redirectPath);
+          router.refresh();
+        }, 200);
       }
     } catch (err) {
       console.error('[LOGIN] Exception:', err);
@@ -126,10 +150,10 @@ function LoginForm() {
 
             <button
               type="submit"
-              disabled={isSubmitting || isLoading}
+              disabled={isSubmitting}
               className="w-full py-3 rounded-lg bg-gradient-to-r from-[#6C3FCE] to-[#C026D3] text-white font-medium hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center justify-center gap-2"
             >
-              {isSubmitting || isLoading ? (
+              {isSubmitting ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin" />
                   Verificando...
@@ -159,6 +183,22 @@ function LoginForm() {
                 disabled={isSubmitting}
               >
                 🏥 Clínica: clinic@demo.tt / demo123
+              </button>
+              <button
+                type="button"
+                onClick={() => { setEmail('lawfirm@demo.tt'); setPassword('demo123'); }}
+                className="w-full text-left p-2 rounded bg-[rgba(108,63,206,0.1)] text-[#9D7BEA] hover:bg-[rgba(108,63,206,0.2)] text-sm transition-colors"
+                disabled={isSubmitting}
+              >
+                ⚖️ Bufete: lawfirm@demo.tt / demo123
+              </button>
+              <button
+                type="button"
+                onClick={() => { setEmail('beauty@demo.tt'); setPassword('demo123'); }}
+                className="w-full text-left p-2 rounded bg-[rgba(108,63,206,0.1)] text-[#9D7BEA] hover:bg-[rgba(108,63,206,0.2)] text-sm transition-colors"
+                disabled={isSubmitting}
+              >
+                💇 Salón: beauty@demo.tt / demo123
               </button>
             </div>
           </div>

@@ -1,11 +1,8 @@
 import { NextAuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
-import bcrypt from 'bcryptjs';
-import { prisma } from '../db';
+import { verifyDemoCredentials, getRedirectPath } from './demo-auth';
 
 export const authOptions: NextAuthOptions = {
-  // NOTE: No PrismaAdapter when using JWT strategy
-  // The adapter is only needed for database sessions
   providers: [
     CredentialsProvider({
       name: 'credentials',
@@ -15,26 +12,44 @@ export const authOptions: NextAuthOptions = {
       },
       async authorize(credentials) {
         console.log('[AUTH] Authorize called for:', credentials?.email);
-        
+
         if (!credentials?.email || !credentials?.password) {
           console.log('[AUTH] Missing credentials');
           return null;
         }
 
+        // Try demo authentication first (works without database)
+        const demoUser = verifyDemoCredentials(credentials.email, credentials.password);
+        if (demoUser) {
+          console.log('[AUTH] Demo authentication successful for:', demoUser.email);
+          return {
+            id: demoUser.id,
+            email: demoUser.email,
+            name: demoUser.name,
+            role: demoUser.role,
+            tenantId: demoUser.tenantId || null,
+            tenantSlug: demoUser.tenantSlug || null,
+            tenantName: demoUser.tenantName || null,
+            industrySlug: demoUser.industrySlug || null,
+          };
+        }
+
+        // If demo auth fails, try database auth
         try {
-          // Find user in database
+          const { prisma } = await import('../db');
+          const bcrypt = await import('bcryptjs');
+
           const user = await prisma.systemUser.findUnique({
             where: { email: credentials.email },
           });
 
-          console.log('[AUTH] User found:', user ? user.email : 'NOT FOUND');
+          console.log('[AUTH] Database user found:', user ? user.email : 'NOT FOUND');
 
           if (!user || !user.isActive) {
             console.log('[AUTH] User not found or inactive');
             return null;
           }
 
-          // Verify password
           const passwordMatch = await bcrypt.compare(
             credentials.password,
             user.passwordHash
@@ -57,13 +72,10 @@ export const authOptions: NextAuthOptions = {
           if (user.tenantId) {
             tenant = await prisma.tenant.findUnique({
               where: { id: user.tenantId },
-            }).catch(err => {
-              console.log('[AUTH] Failed to get tenant:', err.message);
-              return null;
-            });
+            }).catch(() => null);
           }
 
-          console.log('[AUTH] Login successful for:', user.email);
+          console.log('[AUTH] Database login successful for:', user.email);
 
           return {
             id: user.id,
@@ -76,7 +88,7 @@ export const authOptions: NextAuthOptions = {
             industrySlug: tenant?.industrySlug || null,
           };
         } catch (error) {
-          console.error('[AUTH] Error in authorize:', error);
+          console.error('[AUTH] Database error, demo auth also failed:', error);
           return null;
         }
       },
@@ -119,7 +131,7 @@ export const authOptions: NextAuthOptions = {
       console.log(`[AUTH] User signed in: ${user.email}`);
     },
   },
-  debug: true, // Always enable debug for troubleshooting
+  debug: true,
 };
 
 // Type extensions for NextAuth

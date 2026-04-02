@@ -1,10 +1,21 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { Shield, Mail, Lock, Eye, EyeOff, AlertCircle, Loader2 } from 'lucide-react';
 import Link from 'next/link';
+
+// Demo credentials - works without backend
+const DEMO_CREDENTIALS: Record<string, { password: string; redirect: string; name: string }> = {
+  'admin@nexusos.tt': { password: 'admin123', redirect: '/admin', name: 'Super Admin' },
+  'clinic@demo.tt': { password: 'demo123', redirect: '/clinic', name: 'Dr. Juan Martínez' },
+  'lawfirm@demo.tt': { password: 'demo123', redirect: '/lawfirm', name: 'Carlos Pérez' },
+  'beauty@demo.tt': { password: 'demo123', redirect: '/beauty', name: 'Ana Gómez' },
+  'nurse@demo.tt': { password: 'demo123', redirect: '/nurse', name: 'María Rodríguez' },
+  'bakery@demo.tt': { password: 'demo123', redirect: '/bakery', name: 'Pedro González' },
+  'pharmacy@demo.tt': { password: 'demo123', redirect: '/pharmacy', name: 'Laura Fernández' },
+  'insurance@demo.tt': { password: 'demo123', redirect: '/insurance', name: 'Roberto Trinidad' },
+};
 
 function LoginForm() {
   const [email, setEmail] = useState('');
@@ -24,52 +35,40 @@ function LoginForm() {
     setError('');
     setIsSubmitting(true);
 
-    console.log('[LOGIN] Submitting form with email:', email);
+    // Simple client-side authentication
+    const emailLower = email.toLowerCase().trim();
+    const creds = DEMO_CREDENTIALS[emailLower];
+
+    if (!creds) {
+      setError('Email no registrado. Usa las credenciales de demostración.');
+      setIsSubmitting(false);
+      return;
+    }
+
+    if (password !== creds.password) {
+      setError('Contraseña incorrecta.');
+      setIsSubmitting(false);
+      return;
+    }
+
+    // Store auth in localStorage
+    const authData = {
+      email: emailLower,
+      name: creds.name,
+      redirect: creds.redirect,
+      authenticatedAt: new Date().toISOString()
+    };
 
     try {
-      // Use NextAuth signIn directly
-      const result = await signIn('credentials', {
-        email,
-        password,
-        redirect: false,
-      });
-
-      console.log('[LOGIN] SignIn result:', result);
-
-      if (result?.error) {
-        console.log('[LOGIN] Error:', result.error);
-        setError('Credenciales inválidas. Por favor verifica tu email y contraseña.');
-      } else {
-        console.log('[LOGIN] Success! Redirecting...');
-        // Determine redirect based on email
-        let redirectPath = '/admin';
-        if (email.toLowerCase().includes('clinic')) {
-          redirectPath = '/clinic';
-        } else if (email.toLowerCase().includes('lawfirm')) {
-          redirectPath = '/lawfirm';
-        } else if (email.toLowerCase().includes('beauty')) {
-          redirectPath = '/beauty';
-        } else if (email.toLowerCase().includes('nurse')) {
-          redirectPath = '/nurse';
-        } else if (email.toLowerCase().includes('bakery')) {
-          redirectPath = '/bakery';
-        } else if (email.toLowerCase().includes('pharmacy')) {
-          redirectPath = '/pharmacy';
-        } else if (email.toLowerCase().includes('insurance')) {
-          redirectPath = '/insurance';
-        } else if (email.toLowerCase() === 'admin@nexusos.tt') {
-          redirectPath = '/admin';
-        }
-
-        // Small delay to ensure session is set
-        setTimeout(() => {
-          router.push(redirectPath);
-          router.refresh();
-        }, 200);
-      }
+      localStorage.setItem('nexusos-demo-auth', JSON.stringify(authData));
+      
+      // Small delay for UX
+      await new Promise(r => setTimeout(r, 500));
+      
+      // Redirect
+      router.push(creds.redirect);
     } catch (err) {
-      console.error('[LOGIN] Exception:', err);
-      setError('Error inesperado. Por favor intenta de nuevo.');
+      setError('Error al guardar la sesión.');
     } finally {
       setIsSubmitting(false);
     }

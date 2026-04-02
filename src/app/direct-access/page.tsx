@@ -1,25 +1,22 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { signIn } from 'next-auth/react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Loader2, Shield, CheckCircle, XCircle } from 'lucide-react';
-import { DEMO_USERS, DEMO_PASSWORDS, getRedirectPath } from '@/lib/auth/demo-auth';
+import { Loader2, CheckCircle, XCircle } from 'lucide-react';
 
-// Quick access credentials for demo
-const QUICK_ACCESS_TYPES = ['admin', 'clinic', 'lawfirm', 'beauty', 'nurse', 'bakery', 'pharmacy', 'insurance'] as const;
-type QuickAccessType = typeof QUICK_ACCESS_TYPES[number];
-
-const QUICK_ACCESS: Record<QuickAccessType, { email: string; password: string }> = {
-  admin: { email: 'admin@nexusos.tt', password: 'admin123' },
-  clinic: { email: 'clinic@demo.tt', password: 'demo123' },
-  lawfirm: { email: 'lawfirm@demo.tt', password: 'demo123' },
-  beauty: { email: 'beauty@demo.tt', password: 'demo123' },
-  nurse: { email: 'nurse@demo.tt', password: 'demo123' },
-  bakery: { email: 'bakery@demo.tt', password: 'demo123' },
-  pharmacy: { email: 'pharmacy@demo.tt', password: 'demo123' },
-  insurance: { email: 'insurance@demo.tt', password: 'demo123' },
+// Demo credentials - works without backend
+const QUICK_ACCESS: Record<string, { email: string; password: string; redirect: string; name: string }> = {
+  admin: { email: 'admin@nexusos.tt', password: 'admin123', redirect: '/admin', name: 'Super Admin' },
+  clinic: { email: 'clinic@demo.tt', password: 'demo123', redirect: '/clinic', name: 'Dr. Juan Martínez' },
+  lawfirm: { email: 'lawfirm@demo.tt', password: 'demo123', redirect: '/lawfirm', name: 'Carlos Pérez' },
+  beauty: { email: 'beauty@demo.tt', password: 'demo123', redirect: '/beauty', name: 'Ana Gómez' },
+  nurse: { email: 'nurse@demo.tt', password: 'demo123', redirect: '/nurse', name: 'María Rodríguez' },
+  bakery: { email: 'bakery@demo.tt', password: 'demo123', redirect: '/bakery', name: 'Pedro González' },
+  pharmacy: { email: 'pharmacy@demo.tt', password: 'demo123', redirect: '/pharmacy', name: 'Laura Fernández' },
+  insurance: { email: 'insurance@demo.tt', password: 'demo123', redirect: '/insurance', name: 'Roberto Trinidad' },
 };
+
+const VALID_TYPES = Object.keys(QUICK_ACCESS);
 
 export default function DirectAccessPage() {
   const router = useRouter();
@@ -29,44 +26,36 @@ export default function DirectAccessPage() {
 
   useEffect(() => {
     const autoLogin = async () => {
-      const type = (searchParams.get('type') || 'admin') as QuickAccessType;
+      const type = searchParams.get('type') || 'admin';
 
-      if (!QUICK_ACCESS_TYPES.includes(type)) {
+      if (!VALID_TYPES.includes(type)) {
         setStatus('error');
-        setMessage(`Tipo de acceso inválido: ${type}. Use: ${QUICK_ACCESS_TYPES.join(', ')}`);
+        setMessage(`Tipo inválido. Use: ${VALID_TYPES.join(', ')}`);
         return;
       }
 
-      const credentials = QUICK_ACCESS[type];
-      const demoUser = DEMO_USERS[credentials.email];
-
-      setMessage(`Accediendo como ${credentials.email}...`);
+      const creds = QUICK_ACCESS[type];
+      setMessage(`Accediendo como ${creds.email}...`);
 
       try {
-        const result = await signIn('credentials', {
-          email: credentials.email,
-          password: credentials.password,
-          redirect: false,
-        });
+        // Store auth in localStorage
+        const authData = {
+          email: creds.email,
+          name: creds.name,
+          redirect: creds.redirect,
+          authenticatedAt: new Date().toISOString()
+        };
 
-        if (result?.error) {
-          console.error('[DIRECT_ACCESS] Error:', result.error);
-          setStatus('error');
-          setMessage(`Error de autenticación: ${result.error}`);
-          setTimeout(() => router.push('/login'), 3000);
-        } else {
-          setStatus('success');
-          setMessage('¡Acceso autorizado! Redirigiendo...');
+        localStorage.setItem('nexusos-demo-auth', JSON.stringify(authData));
 
-          const redirectPath = demoUser ? getRedirectPath(demoUser) : '/admin';
+        setStatus('success');
+        setMessage('¡Acceso autorizado! Redirigiendo...');
 
-          setTimeout(() => {
-            router.push(redirectPath);
-            router.refresh();
-          }, 500);
-        }
+        setTimeout(() => {
+          router.push(creds.redirect);
+        }, 800);
       } catch (err) {
-        console.error('[DIRECT_ACCESS] Exception:', err);
+        console.error('[DIRECT_ACCESS] Error:', err);
         setStatus('error');
         setMessage('Error de conexión');
         setTimeout(() => router.push('/login'), 2000);
@@ -97,7 +86,7 @@ export default function DirectAccessPage() {
         {/* Quick access buttons for all types */}
         {status === 'error' && (
           <div className="mt-4 flex flex-wrap gap-2 justify-center">
-            {QUICK_ACCESS_TYPES.map((t) => (
+            {VALID_TYPES.map((t) => (
               <button
                 key={t}
                 onClick={() => router.push(`/direct-access?type=${t}`)}

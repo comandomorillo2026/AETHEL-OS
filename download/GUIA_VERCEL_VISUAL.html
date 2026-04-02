@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NexusOS - Guía de Deployment Vercel</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1E3A5F 0%, #2C4A6F 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        
+        .header {
+            text-align: center;
+            padding: 40px;
+            background: white;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+        
+        .logo {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #1E3A5F;
+            margin-bottom: 10px;
+        }
+        
+        .logo span {
+            color: #C4A35A;
+        }
+        
+        .subtitle {
+            color: #666;
+            font-size: 1.2rem;
+        }
+        
+        .why-vercel {
+            background: linear-gradient(135deg, #C4A35A, #D4B36A);
+            color: white;
+            padding: 30px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .why-vercel h2 {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+        }
+        
+        .features {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .feature {
+            background: rgba(255,255,255,0.2);
+            padding: 15px 25px;
+            border-radius: 50px;
+            font-weight: 500;
+        }
+        
+        .step {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .step-number {
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: #1E3A5F;
+            color: white;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            font-weight: bold;
+            border-bottom-right-radius: 20px;
+        }
+        
+        .step-content {
+            padding-left: 70px;
+        }
+        
+        .step h3 {
+            color: #1E3A5F;
+            font-size: 1.4rem;
+            margin-bottom: 15px;
+        }
+        
+        .step p, .step li {
+            line-height: 1.8;
+            color: #555;
+        }
+        
+        .step ol, .step ul {
+            margin-left: 20px;
+            margin-top: 10px;
+        }
+        
+        .step li {
+            margin-bottom: 8px;
+        }
+        
+        .url-box {
+            background: #f5f5f5;
+            padding: 15px 20px;
+            border-radius: 10px;
+            font-family: monospace;
+            font-size: 1.1rem;
+            color: #1E3A5F;
+            margin: 15px 0;
+            border-left: 4px solid #C4A35A;
+        }
+        
+        .modules-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .module-card {
+            background: linear-gradient(135deg, #1E3A5F, #2C4A6F);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+        }
+        
+        .module-card.new {
+            background: linear-gradient(135deg, #C4A35A, #D4B36A);
+        }
+        
+        .module-card h4 {
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+        }
+        
+        .module-card p {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        
+        .success-box {
+            background: linear-gradient(135deg, #10B981, #059669);
+            color: white;
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            margin-top: 30px;
+        }
+        
+        .success-box h2 {
+            font-size: 2rem;
+            margin-bottom: 15px;
+        }
+        
+        .checklist {
+            background: #f9f9f9;
+            padding: 20px 30px;
+            border-radius: 15px;
+            margin-top: 20px;
+        }
+        
+        .checklist li {
+            list-style: none;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .checklist li:last-child {
+            border-bottom: none;
+        }
+        
+        .checklist input {
+            margin-right: 10px;
+            transform: scale(1.3);
+        }
+        
+        .warning {
+            background: #FEF3C7;
+            border-left: 4px solid #F59E0B;
+            padding: 15px 20px;
+            margin: 15px 0;
+            border-radius: 0 10px 10px 0;
+        }
+        
+        .info {
+            background: #DBEAFE;
+            border-left: 4px solid #3B82F6;
+            padding: 15px 20px;
+            margin: 15px 0;
+            border-radius: 0 10px 10px 0;
+        }
+        
+        .btn {
+            display: inline-block;
+            background: #1E3A5F;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: bold;
+            margin: 10px 5px;
+        }
+        
+        .btn:hover {
+            background: #2C4A6F;
+        }
+        
+        .btn.gold {
+            background: #C4A35A;
+            color: #1E3A5F;
+        }
+        
+        .btn.gold:hover {
+            background: #D4B36A;
+        }
+        
+        .links {
+            text-align: center;
+            margin-top: 30px;
+            padding: 30px;
+            background: white;
+            border-radius: 20px;
+        }
+        
+        .footer {
+            text-align: center;
+            color: rgba(255,255,255,0.7);
+            padding: 30px;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">Nexus<span>OS</span></div>
+            <div class="subtitle">Guía de Deployment en Vercel</div>
+        </div>
+        
+        <div class="why-vercel">
+            <h2>¿Por qué Vercel?</h2>
+            <div class="features">
+                <div class="feature">✨ 100% Gratis</div>
+                <div class="feature">🚀 Creado para Next.js</div>
+                <div class="feature">🔒 SSL Incluido</div>
+                <div class="feature">⚡ Deployment Automático</div>
+                <div class="feature">🌍 CDN Global</div>
+            </div>
+        </div>
+        
+        <!-- PASO 1 -->
+        <div class="step">
+            <div class="step-number">1</div>
+            <div class="step-content">
+                <h3>Crear Cuenta en GitHub</h3>
+                <p>GitHub es donde se guarda tu código. Vercel lo lee desde ahí.</p>
+                <ol>
+                    <li>Ve a <strong>github.com</strong></li>
+                    <li>Click en <strong>"Sign Up"</strong></li>
+                    <li>Completa tu registro (es gratis)</li>
+                </ol>
+                <div style="text-align: center; margin-top: 15px;">
+                    <a href="https://github.com" target="_blank" class="btn">Ir a GitHub →</a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- PASO 2 -->
+        <div class="step">
+            <div class="step-number">2</div>
+            <div class="step-content">
+                <h3>Subir tu Proyecto a GitHub</h3>
+                <p><strong>Opción más fácil (Manual):</strong></p>
+                <ol>
+                    <li>En GitHub, click en <strong>"New Repository"</strong></li>
+                    <li>Nombre: <code>nexusos</code></li>
+                    <li>Click <strong>"Create repository"</strong></li>
+                    <li>Click <strong>"uploading an existing file"</strong></li>
+                    <li>Arrastra todos los archivos del proyecto</li>
+                    <li>Click <strong>"Commit changes"</strong></li>
+                </ol>
+                <div class="info">
+                    💡 <strong>Tip:</strong> Descarga el ZIP del proyecto y extrae los archivos antes de subirlos.
+                </div>
+            </div>
+        </div>
+        
+        <!-- PASO 3 -->
+        <div class="step">
+            <div class="step-number">3</div>
+            <div class="step-content">
+                <h3>Crear Cuenta en Vercel</h3>
+                <ol>
+                    <li>Ve a <strong>vercel.com</strong></li>
+                    <li>Click en <strong>"Sign Up"</strong></li>
+                    <li>Elige <strong>"Continue with GitHub"</strong></li>
+                    <li>Autoriza a Vercel para acceder a tu GitHub</li>
+                </ol>
+                <div style="text-align: center; margin-top: 15px;">
+                    <a href="https://vercel.com" target="_blank" class="btn gold">Ir a Vercel →</a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- PASO 4 -->
+        <div class="step">
+            <div class="step-number">4</div>
+            <div class="step-content">
+                <h3>Hacer Deployment</h3>
+                <ol>
+                    <li>En Vercel, click <strong>"Add New Project"</strong></li>
+                    <li>Selecciona tu repositorio <code>nexusos</code></li>
+                    <li>Click <strong>"Import"</strong></li>
+                    <li>Vercel detectará automáticamente Next.js</li>
+                    <li>Click <strong>"Deploy"</strong></li>
+                </ol>
+                <div class="url-box">
+                    ⏱️ Espera 2-3 minutos mientras se compila tu proyecto...
+                </div>
+            </div>
+        </div>
+        
+        <!-- PASO 5 -->
+        <div class="step">
+            <div class="step-number">5</div>
+            <div class="step-content">
+                <h3>Configurar Base de Datos</h3>
+                <p>Necesitas una base de datos PostgreSQL. Opciones gratuitas:</p>
+                
+                <div class="modules-grid">
+                    <div class="module-card">
+                        <h4>Supabase</h4>
+                        <p>supabase.com</p>
+                        <p>500MB gratis</p>
+                    </div>
+                    <div class="module-card">
+                        <h4>Neon</h4>
+                        <p>neon.tech</p>
+                        <p>3GB gratis</p>
+                    </div>
+                    <div class="module-card">
+                        <h4>Vercel Postgres</h4>
+                        <p>Integrado</p>
+                        <p>256MB gratis</p>
+                    </div>
+                </div>
+                
+                <div class="warning" style="margin-top: 20px;">
+                    ⚠️ Después de crear la base de datos, copia la <strong>DATABASE_URL</strong> y agrégala en:<br>
+                    Vercel → Tu Proyecto → Settings → Environment Variables
+                </div>
+            </div>
+        </div>
+        
+        <!-- PASO 6 -->
+        <div class="step">
+            <div class="step-number">6</div>
+            <div class="step-content">
+                <h3>¡Tu Proyecto en Línea!</h3>
+                <p>Vercel te dará una URL como:</p>
+                <div class="url-box">
+                    https://nexusos-tuusuario.vercel.app
+                </div>
+                
+                <h4 style="margin-top: 25px;">Módulos Disponibles:</h4>
+                <div class="modules-grid">
+                    <div class="module-card">
+                        <h4>Sales Portal</h4>
+                        <p>/</p>
+                    </div>
+                    <div class="module-card">
+                        <h4>Admin</h4>
+                        <p>/admin</p>
+                    </div>
+                    <div class="module-card">
+                        <h4>Clínica</h4>
+                        <p>/clinic</p>
+                    </div>
+                    <div class="module-card">
+                        <h4>Enfermería</h4>
+                        <p>/nurse</p>
+                    </div>
+                    <div class="module-card">
+                        <h4>Pacientes</h4>
+                        <p>/portal-paciente</p>
+                    </div>
+                    <div class="module-card">
+                        <h4>Belleza</h4>
+                        <p>/beauty</p>
+                    </div>
+                    <div class="module-card new">
+                        <h4>🏆 Law Firm</h4>
+                        <p>/lawfirm</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="success-box">
+            <h2>🎉 ¡Felicidades!</h2>
+            <p>Tu sistema NexusOS está listo para usar.</p>
+            <p style="margin-top: 15px; opacity: 0.9;">13 módulos empresariales para el Caribe</p>
+        </div>
+        
+        <div class="links">
+            <h3>Enlaces Útiles</h3>
+            <a href="https://vercel.com" target="_blank" class="btn">Vercel</a>
+            <a href="https://github.com" target="_blank" class="btn">GitHub</a>
+            <a href="https://supabase.com" target="_blank" class="btn gold">Supabase</a>
+            <a href="https://neon.tech" target="_blank" class="btn gold">Neon</a>
+        </div>
+        
+        <div class="footer">
+            <p>NexusOS © 2026 - Sistema Multi-tenant para el Caribe</p>
+            <p>Desarrollado con Next.js + Prisma + Tailwind CSS</p>
+        </div>
+    </div>
+</body>
+</html>

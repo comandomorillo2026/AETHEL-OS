@@ -1,0 +1,695 @@
+==========================================
+[2026-03-26 00:48:42] Starting: bun install
+==========================================
+[BUN] Installing dependencies...
+[0.32ms] ".env"
+bun install v1.3.10 (30e609e0)
+
++ @tailwindcss/postcss@4.1.18
++ @types/react@19.2.8
++ @types/react-dom@19.2.3
++ bun-types@1.3.6
++ eslint@9.39.2
++ eslint-config-next@16.1.3
++ tailwindcss@4.1.18
++ tw-animate-css@1.4.0
++ typescript@5.9.3
++ @dnd-kit/core@6.3.1
++ @dnd-kit/sortable@10.0.0
++ @dnd-kit/utilities@3.2.2
++ @hookform/resolvers@5.2.2
++ @mdxeditor/editor@3.52.3
++ @prisma/client@6.19.2
++ @radix-ui/react-accordion@1.2.12
++ @radix-ui/react-alert-dialog@1.1.15
++ @radix-ui/react-aspect-ratio@1.1.8
++ @radix-ui/react-avatar@1.1.11
++ @radix-ui/react-checkbox@1.3.3
++ @radix-ui/react-collapsible@1.1.12
++ @radix-ui/react-context-menu@2.2.16
++ @radix-ui/react-dialog@1.1.15
++ @radix-ui/react-dropdown-menu@2.1.16
++ @radix-ui/react-hover-card@1.1.15
++ @radix-ui/react-label@2.1.8
++ @radix-ui/react-menubar@1.1.16
++ @radix-ui/react-navigation-menu@1.2.14
++ @radix-ui/react-popover@1.1.15
++ @radix-ui/react-progress@1.1.8
++ @radix-ui/react-radio-group@1.3.8
++ @radix-ui/react-scroll-area@1.2.10
++ @radix-ui/react-select@2.2.6
++ @radix-ui/react-separator@1.1.8
++ @radix-ui/react-slider@1.3.6
++ @radix-ui/react-slot@1.2.4
++ @radix-ui/react-switch@1.2.6
++ @radix-ui/react-tabs@1.1.13
++ @radix-ui/react-toast@1.2.15
++ @radix-ui/react-toggle@1.1.10
++ @radix-ui/react-toggle-group@1.1.11
++ @radix-ui/react-tooltip@1.2.8
++ @reactuses/core@6.1.9
++ @tanstack/react-query@5.90.19
++ @tanstack/react-table@8.21.3
++ class-variance-authority@0.7.1
++ clsx@2.1.1
++ cmdk@1.1.1
++ date-fns@4.1.0
++ embla-carousel-react@8.6.0
++ framer-motion@12.26.2
++ input-otp@1.4.2
++ lucide-react@0.525.0
++ next@16.1.3
++ next-auth@4.24.13
++ next-intl@4.7.0
++ next-themes@0.4.6
++ prisma@6.19.2
++ react@19.2.3
++ react-day-picker@9.13.0
++ react-dom@19.2.3
++ react-hook-form@7.71.1
++ react-markdown@10.1.0
++ react-resizable-panels@3.0.6
++ react-syntax-highlighter@15.6.6
++ recharts@2.15.4
++ sharp@0.34.5
++ sonner@2.0.7
++ tailwind-merge@3.4.0
++ tailwindcss-animate@1.0.7
++ uuid@11.1.0
++ vaul@1.1.2
++ z-ai-web-dev-sdk@0.0.17
++ zod@4.3.5
++ zustand@5.0.10
+
+827 packages installed [8.24s]
+==========================================
+[2026-03-26 00:48:50] Completed: bun install
+[LOG] Step: bun install | Duration: 8s
+==========================================
+
+==========================================
+[2026-03-26 00:48:50] Starting: bun run db:push
+==========================================
+[BUN] Setting up database...
+$ prisma db push
+Environment variables loaded from .env
+Prisma schema loaded from prisma/schema.prisma
+Datasource "db": SQLite database "custom.db" at "file:/home/z/my-project/db/custom.db"
+
+SQLite database custom.db created at file:/home/z/my-project/db/custom.db
+
+🚀  Your database is now in sync with your Prisma schema. Done in 18ms
+
+Running generate... (Use --skip-generate to skip the generators)
+[2K[1A[2K[GRunning generate... - Prisma Client
+[2K[1A[2K[G✔ Generated Prisma Client (v6.19.2) to ./node_modules/@prisma/client in 70ms
+┌─────────────────────────────────────────────────────────┐
+│  Update available 6.19.2 -> 7.5.0                       │
+│                                                         │
+│  This is a major update - please follow the guide at    │
+│  https://pris.ly/d/major-version-upgrade                │
+│                                                         │
+│  Run the following to update                            │
+│    npm i --save-dev prisma@latest                       │
+│    npm i @prisma/client@latest                          │
+└─────────────────────────────────────────────────────────┘
+
+==========================================
+[2026-03-26 00:48:52] Completed: bun run db:push
+[LOG] Step: bun run db:push | Duration: 2s
+==========================================
+
+==========================================
+[2026-03-26 00:48:52] Starting: Starting Next.js dev server
+==========================================
+[BUN] Starting development server...
+==========================================
+$ next dev -p 3000 2>&1 | tee dev.log
+[2026-03-26 00:48:52] Completed: Starting Next.js dev server
+[LOG] Step: Starting Next.js dev server | Duration: 0s
+==========================================
+
+==========================================
+[2026-03-26 00:48:52] Starting: Waiting for Next.js dev server
+==========================================
+Waiting for Next.js dev server to be ready on localhost:3000...
+Attempt 1/60: Next.js dev server not ready yet, waiting...
+▲ Next.js 16.1.3 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://21.0.9.192:3000
+- Environments: .env
+
+✓ Starting...
+Attention: Next.js now collects completely anonymous telemetry regarding usage.
+This information is used to shape Next.js' roadmap and prioritize features.
+You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+https://nextjs.org/telemetry
+
+
+  We detected TypeScript in your project and reconfigured your tsconfig.json file for you.
+  The following suggested values were added to your tsconfig.json. These values can be changed to fit your project's needs:
+
+  	- include was updated to add '.next/dev/types/**/*.ts'
+
+  The following mandatory changes were made to your tsconfig.json:
+
+  	- jsx was set to react-jsx (next.js uses the React automatic runtime)
+
+✓ Ready in 917ms
+ GET / 200 in 2.7s (compile: 2.5s, render: 202ms)
+Next.js dev server is ready!
+==========================================
+ GET / 200 in 2.7s (compile: 2.5s, render: 141ms)
+[2026-03-26 00:48:56] Completed: Waiting for Next.js dev server
+[LOG] Step: Waiting for Next.js dev server | Duration: 4s
+==========================================
+
+==========================================
+[2026-03-26 00:48:56] Starting: Health check
+==========================================
+[BUN] Performing health check...
+ GET / 200 in 25ms (compile: 1864µs, render: 23ms)
+[BUN] Health check passed
+==========================================
+[2026-03-26 00:48:56] Completed: Health check
+[LOG] Step: Health check | Duration: 0s
+==========================================
+
+==========================================
+[2026-03-26 00:48:56] Starting: Starting mini-services
+==========================================
+Found mini-services directory, scanning for sub-services...
+Mini-services startup completed. Started 0 service(s).
+==========================================
+[2026-03-26 00:48:56] Completed: Starting mini-services
+[LOG] Step: Starting mini-services | Duration: 0s
+==========================================
+
+Next.js dev server is running in background (PID: 696).
+Use 'kill 696' to stop it.
+✓ Compiled in 185ms
+✓ Compiled in 257ms
+✓ Compiled in 209ms
+ GET / 200 in 24ms (compile: 10ms, render: 14ms)
+ GET / 200 in 164ms (compile: 48ms, render: 116ms)
+✓ Compiled in 169ms
+✓ Compiled in 208ms
+✓ Compiled in 269ms
+✓ Compiled in 167ms
+✓ Compiled in 307ms
+⚠ Fast Refresh had to perform a full reload when ./src/app/page.tsx changed. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ GET / 200 in 185ms (compile: 30ms, render: 155ms)
+⚠ Cross origin request detected from preview-chat-439a727e-af4c-4958-846a-03a62d413519.space.z.ai to /_next/* resource. In a future major version of Next.js, you will need to explicitly configure "allowedDevOrigins" in next.config to allow this.
+Read more: https://nextjs.org/docs/app/api-reference/config/next-config-js/allowedDevOrigins
+ GET / 200 in 45ms (compile: 33ms, render: 12ms)
+ GET / 200 in 12ms (compile: 1669µs, render: 10ms)
+ GET / 200 in 23ms (compile: 3ms, render: 20ms)
+ GET / 200 in 16ms (compile: 1866µs, render: 14ms)
+ GET / 200 in 17ms (compile: 1707µs, render: 16ms)
+ GET / 200 in 20ms (compile: 3ms, render: 17ms)
+ GET / 200 in 15ms (compile: 1785µs, render: 13ms)
+ GET / 200 in 32ms (compile: 1767µs, render: 30ms)
+ GET / 200 in 14ms (compile: 1588µs, render: 12ms)
+ GET / 200 in 32ms (compile: 2ms, render: 29ms)
+ GET / 200 in 18ms (compile: 1680µs, render: 16ms)
+ GET / 200 in 29ms (compile: 3ms, render: 27ms)
+ GET / 200 in 17ms (compile: 4ms, render: 13ms)
+ GET / 200 in 17ms (compile: 3ms, render: 14ms)
+ GET / 200 in 18ms (compile: 3ms, render: 15ms)
+ GET / 200 in 15ms (compile: 2ms, render: 13ms)
+ GET / 200 in 14ms (compile: 1632µs, render: 13ms)
+ GET / 200 in 19ms (compile: 2ms, render: 16ms)
+✓ Compiled in 120ms
+✓ Compiled in 201ms
+ GET / 200 in 186ms (compile: 39ms, render: 147ms)
+==========================================
+[2026-03-27 16:44:05] Starting: bun install
+==========================================
+[BUN] Installing dependencies...
+[0.02ms] ".env"
+bun install v1.3.10 (30e609e0)
+
+Checked 846 installs across 915 packages (no changes) [26.00ms]
+==========================================
+[2026-03-27 16:44:05] Completed: bun install
+[LOG] Step: bun install | Duration: 0s
+==========================================
+
+==========================================
+[2026-03-27 16:44:05] Starting: bun run db:push
+==========================================
+[BUN] Setting up database...
+$ prisma db push
+Environment variables loaded from .env
+Prisma schema loaded from prisma/schema.prisma
+Datasource "db": SQLite database "custom.db" at "file:/home/z/my-project/db/custom.db"
+
+🚀  Your database is now in sync with your Prisma schema. Done in 56ms
+
+Running generate... (Use --skip-generate to skip the generators)
+[2K[1A[2K[GRunning generate... - Prisma Client
+[2K[1A[2K[G✔ Generated Prisma Client (v6.19.2) to ./node_modules/@prisma/client in 346ms
+
+==========================================
+[2026-03-27 16:44:07] Completed: bun run db:push
+[LOG] Step: bun run db:push | Duration: 2s
+==========================================
+
+==========================================
+[2026-03-27 16:44:07] Starting: Starting Next.js dev server
+==========================================
+[BUN] Starting development server...
+==========================================
+[2026-03-27 16:44:07] Completed: Starting Next.js dev server
+[LOG] Step: Starting Next.js dev server | Duration: 0s
+==========================================
+
+==========================================
+$ next dev -p 3000 2>&1 | tee dev.log
+[2026-03-27 16:44:07] Starting: Waiting for Next.js dev server
+==========================================
+Waiting for Next.js dev server to be ready on localhost:3000...
+Attempt 1/60: Next.js dev server not ready yet, waiting...
+▲ Next.js 16.1.3 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://21.0.14.192:3000
+- Environments: .env
+
+✓ Starting...
+Attention: Next.js now collects completely anonymous telemetry regarding usage.
+This information is used to shape Next.js' roadmap and prioritize features.
+You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+https://nextjs.org/telemetry
+
+✓ Ready in 591ms
+Next.js dev server is ready!
+ GET / 200 in 2.3s (compile: 2.2s, render: 124ms)
+==========================================
+[2026-03-27 16:44:10] Completed: Waiting for Next.js dev server
+[LOG] Step: Waiting for Next.js dev server | Duration: 3s
+==========================================
+
+==========================================
+[2026-03-27 16:44:10] Starting: Health check
+==========================================
+[BUN] Performing health check...
+ GET / 200 in 26ms (compile: 2ms, render: 24ms)
+[BUN] Health check passed
+==========================================
+[2026-03-27 16:44:10] Completed: Health check
+[LOG] Step: Health check | Duration: 0s
+==========================================
+
+==========================================
+[2026-03-27 16:44:10] Starting: Starting mini-services
+==========================================
+Found mini-services directory, scanning for sub-services...
+Mini-services startup completed. Started 0 service(s).
+==========================================
+[2026-03-27 16:44:10] Completed: Starting mini-services
+[LOG] Step: Starting mini-services | Duration: 0s
+==========================================
+
+Next.js dev server is running in background (PID: 1382).
+Use 'kill 1382' to stop it.
+ GET / 200 in 152ms (compile: 67ms, render: 86ms)
+✓ Compiled in 232ms
+⚠ Fast Refresh had to perform a full reload when ./src/app/page.tsx changed. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ GET / 200 in 112ms (compile: 28ms, render: 84ms)
+ GET / 200 in 50ms (compile: 3ms, render: 47ms)
+✓ Compiled in 191ms
+✓ Compiled in 226ms
+ GET / 200 in 46ms (compile: 24ms, render: 22ms)
+ GET / 200 in 15ms (compile: 2ms, render: 13ms)
+ GET / 200 in 16ms (compile: 3ms, render: 14ms)
+ GET / 200 in 22ms (compile: 3ms, render: 19ms)
+ GET / 200 in 25ms (compile: 4ms, render: 21ms)
+ GET / 200 in 14ms (compile: 2ms, render: 12ms)
+ GET / 200 in 14ms (compile: 2ms, render: 12ms)
+ GET / 200 in 15ms (compile: 2ms, render: 13ms)
+ GET / 200 in 13ms (compile: 1953µs, render: 11ms)
+ GET / 200 in 15ms (compile: 3ms, render: 12ms)
+ GET / 200 in 17ms (compile: 2ms, render: 15ms)
+ GET / 200 in 15ms (compile: 3ms, render: 13ms)
+ GET / 200 in 13ms (compile: 2ms, render: 11ms)
+ GET / 200 in 21ms (compile: 2ms, render: 19ms)
+ GET / 200 in 16ms (compile: 3ms, render: 13ms)
+ GET / 200 in 14ms (compile: 3ms, render: 12ms)
+ GET / 200 in 15ms (compile: 2ms, render: 12ms)
+ GET / 200 in 15ms (compile: 1979µs, render: 13ms)
+ GET / 200 in 13ms (compile: 2ms, render: 10ms)
+ GET / 200 in 14ms (compile: 2ms, render: 12ms)
+ GET / 200 in 22ms (compile: 2ms, render: 20ms)
+ GET / 200 in 16ms (compile: 3ms, render: 13ms)
+ GET / 200 in 15ms (compile: 2ms, render: 12ms)
+ GET / 200 in 13ms (compile: 2ms, render: 11ms)
+ GET / 200 in 13ms (compile: 1884µs, render: 11ms)
+ GET / 200 in 15ms (compile: 3ms, render: 13ms)
+ GET / 200 in 14ms (compile: 2ms, render: 12ms)
+ GET / 200 in 17ms (compile: 2ms, render: 14ms)
+ GET / 200 in 12ms (compile: 2ms, render: 10ms)
+ GET / 200 in 12ms (compile: 2ms, render: 10ms)
+ GET / 200 in 12ms (compile: 1945µs, render: 10ms)
+ GET / 200 in 13ms (compile: 2ms, render: 11ms)
+ GET / 200 in 14ms (compile: 2ms, render: 12ms)
+ GET / 200 in 19ms (compile: 2ms, render: 17ms)
+ GET / 200 in 15ms (compile: 2ms, render: 12ms)
+ GET / 200 in 14ms (compile: 2ms, render: 11ms)
+ GET / 200 in 15ms (compile: 2ms, render: 12ms)
+ GET / 200 in 16ms (compile: 3ms, render: 13ms)
+ GET / 200 in 13ms (compile: 2ms, render: 11ms)
+ GET / 200 in 17ms (compile: 3ms, render: 14ms)
+ GET / 200 in 16ms (compile: 3ms, render: 13ms)
+ GET / 200 in 14ms (compile: 2ms, render: 12ms)
+ GET / 200 in 13ms (compile: 2ms, render: 11ms)
+ GET / 200 in 12ms (compile: 2ms, render: 10ms)
+✓ Compiled in 240ms
+ GET / 200 in 73ms (compile: 42ms, render: 30ms)
+ GET / 200 in 15ms (compile: 2ms, render: 13ms)
+ GET / 200 in 15ms (compile: 2ms, render: 13ms)
+ GET / 200 in 14ms (compile: 2ms, render: 11ms)
+ GET / 200 in 17ms (compile: 2ms, render: 15ms)
+ GET / 200 in 13ms (compile: 2ms, render: 10ms)
+ GET / 200 in 14ms (compile: 2ms, render: 12ms)
+ GET / 200 in 19ms (compile: 3ms, render: 17ms)
+ GET / 200 in 13ms (compile: 2ms, render: 11ms)
+ GET / 200 in 14ms (compile: 2ms, render: 12ms)
+ GET / 200 in 15ms (compile: 2ms, render: 13ms)
+ GET / 200 in 13ms (compile: 1971µs, render: 11ms)
+ GET / 200 in 13ms (compile: 1979µs, render: 11ms)
+ GET / 200 in 15ms (compile: 2ms, render: 12ms)
+ GET / 200 in 13ms (compile: 1969µs, render: 11ms)
+ GET / 200 in 13ms (compile: 1943µs, render: 11ms)
+ GET / 200 in 22ms (compile: 1948µs, render: 20ms)
+ GET / 200 in 14ms (compile: 2ms, render: 12ms)
+ GET / 200 in 13ms (compile: 2ms, render: 11ms)
+ GET / 200 in 12ms (compile: 2ms, render: 10ms)
+ GET / 200 in 13ms (compile: 1946µs, render: 11ms)
+ GET / 200 in 14ms (compile: 2ms, render: 12ms)
+ GET / 200 in 14ms (compile: 2ms, render: 11ms)
+ GET / 200 in 16ms (compile: 2ms, render: 14ms)
+ GET / 200 in 12ms (compile: 1940µs, render: 10ms)
+ GET / 200 in 13ms (compile: 1852µs, render: 11ms)
+ GET / 200 in 13ms (compile: 2ms, render: 11ms)
+ GET / 200 in 13ms (compile: 1935µs, render: 11ms)
+ GET / 200 in 13ms (compile: 2ms, render: 11ms)
+ GET / 200 in 18ms (compile: 2ms, render: 15ms)
+ GET / 200 in 13ms (compile: 1898µs, render: 11ms)
+ GET / 200 in 13ms (compile: 2ms, render: 11ms)
+ GET / 200 in 13ms (compile: 1902µs, render: 11ms)
+ GET / 200 in 12ms (compile: 2ms, render: 10ms)
+ GET / 200 in 13ms (compile: 2ms, render: 11ms)
+ GET / 200 in 32ms (compile: 3ms, render: 29ms)
+ GET / 200 in 14ms (compile: 3ms, render: 12ms)
+ GET / 200 in 13ms (compile: 2ms, render: 11ms)
+ GET / 200 in 12ms (compile: 2ms, render: 10ms)
+ GET / 200 in 12ms (compile: 1814µs, render: 10ms)
+ GET / 200 in 13ms (compile: 2ms, render: 11ms)
+ GET / 200 in 12ms (compile: 2ms, render: 10ms)
+ GET / 200 in 15ms (compile: 1996µs, render: 13ms)
+ GET / 200 in 12ms (compile: 1910µs, render: 11ms)
+ GET / 200 in 12ms (compile: 1933µs, render: 11ms)
+ GET / 200 in 13ms (compile: 2ms, render: 10ms)
+✓ Compiled in 217ms
+ GET / 200 in 77ms (compile: 42ms, render: 34ms)
+ GET / 200 in 17ms (compile: 3ms, render: 15ms)
+ GET / 200 in 15ms (compile: 2ms, render: 13ms)
+ GET / 200 in 16ms (compile: 2ms, render: 14ms)
+ GET / 200 in 13ms (compile: 2ms, render: 11ms)
+ GET / 200 in 16ms (compile: 2ms, render: 14ms)
+ GET / 200 in 14ms (compile: 2ms, render: 12ms)
+ GET / 200 in 14ms (compile: 2ms, render: 11ms)
+ GET / 200 in 22ms (compile: 3ms, render: 19ms)
+ GET / 200 in 24ms (compile: 3ms, render: 22ms)
+ GET / 200 in 21ms (compile: 3ms, render: 18ms)
+ GET / 200 in 14ms (compile: 2ms, render: 12ms)
+ GET / 200 in 29ms (compile: 2ms, render: 27ms)
+ GET / 200 in 14ms (compile: 3ms, render: 12ms)
+ GET / 200 in 16ms (compile: 3ms, render: 13ms)
+ GET / 200 in 14ms (compile: 3ms, render: 12ms)
+ GET / 200 in 17ms (compile: 3ms, render: 15ms)
+ GET / 200 in 16ms (compile: 2ms, render: 13ms)
+ GET / 200 in 15ms (compile: 3ms, render: 12ms)
+ GET / 200 in 14ms (compile: 2ms, render: 12ms)
+ GET / 200 in 15ms (compile: 2ms, render: 12ms)
+ GET / 200 in 15ms (compile: 3ms, render: 13ms)
+ GET / 200 in 19ms (compile: 2ms, render: 17ms)
+ GET / 200 in 13ms (compile: 2ms, render: 11ms)
+ GET / 200 in 13ms (compile: 1943µs, render: 11ms)
+ GET / 200 in 13ms (compile: 2ms, render: 11ms)
+ GET / 200 in 16ms (compile: 3ms, render: 13ms)
+ GET / 200 in 20ms (compile: 3ms, render: 17ms)
+ GET / 200 in 24ms (compile: 3ms, render: 21ms)
+ GET / 200 in 14ms (compile: 2ms, render: 12ms)
+ GET / 200 in 18ms (compile: 2ms, render: 15ms)
+ GET / 200 in 15ms (compile: 3ms, render: 12ms)
+ GET / 200 in 14ms (compile: 2ms, render: 12ms)
+ GET / 200 in 15ms (compile: 2ms, render: 13ms)
+ GET / 200 in 15ms (compile: 2ms, render: 13ms)
+ GET / 200 in 16ms (compile: 4ms, render: 12ms)
+ GET / 200 in 15ms (compile: 2ms, render: 13ms)
+ GET / 200 in 13ms (compile: 2ms, render: 11ms)
+ GET / 200 in 15ms (compile: 1966µs, render: 13ms)
+ GET / 200 in 22ms (compile: 1989µs, render: 20ms)
+ GET / 200 in 14ms (compile: 2ms, render: 12ms)
+ GET / 200 in 15ms (compile: 2ms, render: 12ms)
+ GET / 200 in 15ms (compile: 3ms, render: 13ms)
+ GET / 200 in 16ms (compile: 4ms, render: 12ms)
+ GET / 200 in 13ms (compile: 2ms, render: 11ms)
+ GET / 200 in 18ms (compile: 2ms, render: 16ms)
+ GET / 200 in 13ms (compile: 2ms, render: 11ms)
+ GET / 200 in 13ms (compile: 2ms, render: 11ms)
+✓ Compiled in 222ms
+ GET / 200 in 78ms (compile: 41ms, render: 37ms)
+ GET / 200 in 15ms (compile: 2ms, render: 13ms)
+ GET / 200 in 15ms (compile: 2ms, render: 13ms)
+ GET / 200 in 13ms (compile: 1983µs, render: 11ms)
+ GET / 200 in 14ms (compile: 2ms, render: 12ms)
+ GET / 200 in 16ms (compile: 2ms, render: 14ms)
+ GET / 200 in 13ms (compile: 1935µs, render: 11ms)
+ GET / 200 in 14ms (compile: 2ms, render: 12ms)
+ GET / 200 in 17ms (compile: 2ms, render: 15ms)
+ GET / 200 in 13ms (compile: 2ms, render: 11ms)
+ GET / 200 in 14ms (compile: 2ms, render: 11ms)
+ GET / 200 in 15ms (compile: 1951µs, render: 13ms)
+ GET / 200 in 13ms (compile: 1992µs, render: 11ms)
+ GET / 200 in 13ms (compile: 1910µs, render: 11ms)
+ GET / 200 in 21ms (compile: 2ms, render: 19ms)
+ GET / 200 in 14ms (compile: 1962µs, render: 12ms)
+ GET / 200 in 12ms (compile: 1826µs, render: 10ms)
+ GET / 200 in 13ms (compile: 1946µs, render: 11ms)
+ GET / 200 in 14ms (compile: 3ms, render: 11ms)
+ GET / 200 in 14ms (compile: 2ms, render: 11ms)
+ GET / 200 in 13ms (compile: 2ms, render: 11ms)
+ GET / 200 in 15ms (compile: 2ms, render: 13ms)
+ GET / 200 in 13ms (compile: 2ms, render: 11ms)
+ GET / 200 in 13ms (compile: 1943µs, render: 11ms)
+ GET / 200 in 13ms (compile: 1839µs, render: 11ms)
+ GET / 200 in 14ms (compile: 1957µs, render: 12ms)
+ GET / 200 in 16ms (compile: 2ms, render: 14ms)
+ GET / 200 in 20ms (compile: 2ms, render: 18ms)
+ GET / 200 in 13ms (compile: 2ms, render: 11ms)
+ GET / 200 in 15ms (compile: 2ms, render: 12ms)
+ GET / 200 in 13ms (compile: 1877µs, render: 11ms)
+ GET / 200 in 13ms (compile: 1968µs, render: 11ms)
+ GET / 200 in 14ms (compile: 2ms, render: 12ms)
+ GET / 200 in 19ms (compile: 2ms, render: 17ms)
+ GET / 200 in 16ms (compile: 3ms, render: 13ms)
+ GET / 200 in 15ms (compile: 2ms, render: 12ms)
+ GET / 200 in 13ms (compile: 2ms, render: 11ms)
+ GET / 200 in 17ms (compile: 2ms, render: 15ms)
+ GET / 200 in 17ms (compile: 3ms, render: 14ms)
+ GET / 200 in 15ms (compile: 2ms, render: 13ms)
+ GET / 200 in 15ms (compile: 2ms, render: 13ms)
+ GET / 200 in 13ms (compile: 2ms, render: 11ms)
+ GET / 200 in 15ms (compile: 2ms, render: 13ms)
+ GET / 200 in 16ms (compile: 2ms, render: 14ms)
+ GET / 200 in 13ms (compile: 1967µs, render: 11ms)
+ GET / 200 in 15ms (compile: 1899µs, render: 13ms)
+ GET / 200 in 15ms (compile: 2ms, render: 12ms)
+ GET / 200 in 19ms (compile: 5ms, render: 14ms)
+ GET / 200 in 14ms (compile: 2ms, render: 12ms)
+ GET / 200 in 15ms (compile: 2ms, render: 12ms)
+✓ Compiled in 207ms
+ GET / 200 in 117ms (compile: 5ms, render: 112ms)
+✓ Compiled in 223ms
+✓ Compiled in 317ms
+ GET / 200 in 66ms (compile: 40ms, render: 26ms)
+ GET / 200 in 23ms (compile: 2ms, render: 21ms)
+ GET / 200 in 15ms (compile: 3ms, render: 13ms)
+ GET / 200 in 16ms (compile: 2ms, render: 13ms)
+ GET / 200 in 16ms (compile: 2ms, render: 14ms)
+ GET / 200 in 17ms (compile: 3ms, render: 15ms)
+ GET / 200 in 16ms (compile: 2ms, render: 13ms)
+ GET / 200 in 15ms (compile: 3ms, render: 12ms)
+ GET / 200 in 19ms (compile: 2ms, render: 16ms)
+ GET / 200 in 14ms (compile: 2ms, render: 12ms)
+ GET / 200 in 13ms (compile: 1976µs, render: 11ms)
+ GET / 200 in 20ms (compile: 2ms, render: 18ms)
+ GET / 200 in 15ms (compile: 2ms, render: 13ms)
+ GET / 200 in 13ms (compile: 2ms, render: 11ms)
+ GET / 200 in 14ms (compile: 2ms, render: 12ms)
+ GET / 200 in 16ms (compile: 2ms, render: 13ms)
+ GET / 200 in 14ms (compile: 2ms, render: 12ms)
+ GET / 200 in 14ms (compile: 2ms, render: 12ms)
+ GET / 200 in 17ms (compile: 2ms, render: 15ms)
+ GET / 200 in 13ms (compile: 1886µs, render: 11ms)
+ GET / 200 in 13ms (compile: 1885µs, render: 11ms)
+ GET / 200 in 13ms (compile: 2ms, render: 11ms)
+ GET / 200 in 14ms (compile: 2ms, render: 11ms)
+ GET / 200 in 14ms (compile: 2ms, render: 11ms)
+ GET / 200 in 18ms (compile: 1979µs, render: 16ms)
+ GET / 200 in 13ms (compile: 1876µs, render: 11ms)
+ GET / 200 in 13ms (compile: 1902µs, render: 11ms)
+ GET / 200 in 13ms (compile: 1958µs, render: 11ms)
+ GET / 200 in 13ms (compile: 2ms, render: 11ms)
+ GET / 200 in 13ms (compile: 2ms, render: 11ms)
+ GET / 200 in 17ms (compile: 2ms, render: 15ms)
+ GET / 200 in 13ms (compile: 2ms, render: 11ms)
+ GET / 200 in 14ms (compile: 2ms, render: 12ms)
+ GET / 200 in 13ms (compile: 1926µs, render: 11ms)
+ GET / 200 in 13ms (compile: 2ms, render: 11ms)
+ GET / 200 in 13ms (compile: 2ms, render: 11ms)
+ GET / 200 in 25ms (compile: 2ms, render: 22ms)
+ GET / 200 in 16ms (compile: 3ms, render: 13ms)
+ GET / 200 in 15ms (compile: 2ms, render: 12ms)
+ GET / 200 in 15ms (compile: 2ms, render: 13ms)
+ GET / 200 in 14ms (compile: 3ms, render: 11ms)
+ GET / 200 in 14ms (compile: 2ms, render: 12ms)
+ GET / 200 in 134ms (compile: 123ms, render: 11ms)
+ GET / 200 in 13ms (compile: 1943µs, render: 11ms)
+ GET / 200 in 14ms (compile: 2ms, render: 11ms)
+ GET / 200 in 14ms (compile: 2ms, render: 12ms)
+ GET / 200 in 14ms (compile: 2ms, render: 12ms)
+ GET / 200 in 14ms (compile: 2ms, render: 12ms)
+ GET / 200 in 14ms (compile: 2ms, render: 12ms)
+ GET / 200 in 18ms (compile: 2ms, render: 16ms)
+ GET / 200 in 14ms (compile: 3ms, render: 12ms)
+ GET / 200 in 14ms (compile: 2ms, render: 12ms)
+✓ Compiled in 206ms
+ GET / 200 in 74ms (compile: 47ms, render: 27ms)
+ GET / 200 in 22ms (compile: 3ms, render: 20ms)
+ GET / 200 in 15ms (compile: 2ms, render: 13ms)
+ GET / 200 in 24ms (compile: 2ms, render: 21ms)
+ GET / 200 in 15ms (compile: 1945µs, render: 13ms)
+ GET / 200 in 14ms (compile: 2ms, render: 12ms)
+ GET / 200 in 14ms (compile: 2ms, render: 12ms)
+ GET / 200 in 15ms (compile: 3ms, render: 12ms)
+ GET / 200 in 16ms (compile: 3ms, render: 14ms)
+ GET / 200 in 22ms (compile: 3ms, render: 18ms)
+ GET / 200 in 14ms (compile: 3ms, render: 12ms)
+ GET / 200 in 13ms (compile: 2ms, render: 11ms)
+ GET / 200 in 16ms (compile: 1915µs, render: 14ms)
+ GET / 200 in 14ms (compile: 2ms, render: 12ms)
+ GET / 200 in 14ms (compile: 2ms, render: 12ms)
+ GET / 200 in 29ms (compile: 2ms, render: 26ms)
+ GET / 200 in 15ms (compile: 2ms, render: 13ms)
+ GET / 200 in 13ms (compile: 2ms, render: 11ms)
+ GET / 200 in 16ms (compile: 3ms, render: 13ms)
+ GET / 200 in 16ms (compile: 3ms, render: 13ms)
+ GET / 200 in 15ms (compile: 2ms, render: 13ms)
+ GET / 200 in 16ms (compile: 2ms, render: 13ms)
+ GET / 200 in 21ms (compile: 3ms, render: 18ms)
+ GET / 200 in 15ms (compile: 2ms, render: 12ms)
+ GET / 200 in 15ms (compile: 2ms, render: 13ms)
+ GET / 200 in 15ms (compile: 2ms, render: 13ms)
+ GET / 200 in 16ms (compile: 2ms, render: 13ms)
+ GET / 200 in 14ms (compile: 2ms, render: 12ms)
+ GET / 200 in 18ms (compile: 3ms, render: 16ms)
+ GET / 200 in 13ms (compile: 1834µs, render: 11ms)
+ GET / 200 in 15ms (compile: 2ms, render: 13ms)
+ GET / 200 in 14ms (compile: 2ms, render: 12ms)
+ GET / 200 in 14ms (compile: 2ms, render: 12ms)
+ GET / 200 in 14ms (compile: 2ms, render: 12ms)
+ GET / 200 in 18ms (compile: 2ms, render: 16ms)
+ GET / 200 in 15ms (compile: 3ms, render: 12ms)
+ GET / 200 in 16ms (compile: 3ms, render: 13ms)
+ GET / 200 in 14ms (compile: 2ms, render: 12ms)
+ GET / 200 in 15ms (compile: 2ms, render: 12ms)
+ GET / 200 in 14ms (compile: 2ms, render: 12ms)
+ GET / 200 in 27ms (compile: 3ms, render: 25ms)
+ GET / 200 in 15ms (compile: 2ms, render: 12ms)
+ GET / 200 in 16ms (compile: 3ms, render: 13ms)
+ GET / 200 in 14ms (compile: 2ms, render: 12ms)
+ GET / 200 in 14ms (compile: 2ms, render: 12ms)
+ GET / 200 in 15ms (compile: 2ms, render: 13ms)
+ GET / 200 in 15ms (compile: 2ms, render: 12ms)
+ GET / 200 in 13ms (compile: 2ms, render: 11ms)
+ GET / 200 in 13ms (compile: 2ms, render: 11ms)
+ GET / 200 in 16ms (compile: 2ms, render: 13ms)
+ GET / 200 in 15ms (compile: 2ms, render: 12ms)
+ GET / 200 in 13ms (compile: 2ms, render: 11ms)
+ GET / 200 in 13ms (compile: 1990µs, render: 11ms)
+ GET / 200 in 13ms (compile: 2ms, render: 11ms)
+ GET / 200 in 105ms (compile: 3ms, render: 102ms)
+ GET / 200 in 43ms (compile: 1958µs, render: 41ms)
+ GET / 200 in 68ms (compile: 44ms, render: 23ms)
+ GET / 200 in 27ms (compile: 1974µs, render: 25ms)
+ GET / 200 in 16ms (compile: 2ms, render: 13ms)
+ GET / 200 in 15ms (compile: 3ms, render: 12ms)
+ GET / 200 in 14ms (compile: 2ms, render: 12ms)
+ GET / 200 in 13ms (compile: 1831µs, render: 11ms)
+ GET / 200 in 14ms (compile: 1966µs, render: 12ms)
+ GET / 200 in 19ms (compile: 2ms, render: 16ms)
+ GET / 200 in 16ms (compile: 2ms, render: 14ms)
+ GET / 200 in 15ms (compile: 1952µs, render: 13ms)
+ GET / 200 in 15ms (compile: 1938µs, render: 13ms)
+ GET / 200 in 14ms (compile: 1910µs, render: 12ms)
+ GET / 200 in 12ms (compile: 1816µs, render: 11ms)
+ GET / 200 in 18ms (compile: 2ms, render: 16ms)
+ GET / 200 in 13ms (compile: 1970µs, render: 11ms)
+ GET / 200 in 14ms (compile: 2ms, render: 12ms)
+ GET / 200 in 25ms (compile: 2ms, render: 23ms)
+ GET / 200 in 16ms (compile: 2ms, render: 14ms)
+ GET / 200 in 12ms (compile: 1878µs, render: 11ms)
+ GET / 200 in 13ms (compile: 1937µs, render: 11ms)
+ GET / 200 in 13ms (compile: 1788µs, render: 11ms)
+ GET / 200 in 14ms (compile: 2ms, render: 12ms)
+ GET / 200 in 14ms (compile: 2ms, render: 12ms)
+ GET / 200 in 16ms (compile: 2ms, render: 14ms)
+ GET / 200 in 13ms (compile: 2ms, render: 11ms)
+ GET / 200 in 13ms (compile: 1836µs, render: 11ms)
+ GET / 200 in 13ms (compile: 1901µs, render: 11ms)
+ GET / 200 in 13ms (compile: 1990µs, render: 11ms)
+ GET / 200 in 13ms (compile: 2ms, render: 11ms)
+ GET / 200 in 20ms (compile: 2ms, render: 17ms)
+ GET / 200 in 13ms (compile: 1898µs, render: 11ms)
+ GET / 200 in 14ms (compile: 1963µs, render: 12ms)
+ GET / 200 in 15ms (compile: 2ms, render: 12ms)
+ GET / 200 in 15ms (compile: 2ms, render: 12ms)
+ GET / 200 in 21ms (compile: 3ms, render: 18ms)
+ GET / 200 in 17ms (compile: 2ms, render: 15ms)
+ GET / 200 in 17ms (compile: 2ms, render: 15ms)
+ GET / 200 in 15ms (compile: 2ms, render: 13ms)
+ GET / 200 in 15ms (compile: 2ms, render: 13ms)
+ GET / 200 in 16ms (compile: 3ms, render: 13ms)
+ GET / 200 in 17ms (compile: 3ms, render: 15ms)
+ GET / 200 in 15ms (compile: 2ms, render: 13ms)
+ GET / 200 in 15ms (compile: 2ms, render: 13ms)
+ GET / 200 in 17ms (compile: 1972µs, render: 15ms)
+ GET / 200 in 14ms (compile: 2ms, render: 12ms)
+ GET / 200 in 15ms (compile: 2ms, render: 13ms)
+ GET / 200 in 18ms (compile: 3ms, render: 15ms)
+ GET / 200 in 14ms (compile: 2ms, render: 12ms)
+ GET / 200 in 15ms (compile: 2ms, render: 13ms)
+ GET / 200 in 18ms (compile: 3ms, render: 15ms)
+ GET / 200 in 15ms (compile: 2ms, render: 12ms)
+ GET / 200 in 20ms (compile: 3ms, render: 18ms)
+ GET / 200 in 17ms (compile: 2ms, render: 15ms)
+ GET / 200 in 17ms (compile: 2ms, render: 15ms)
+ GET / 200 in 16ms (compile: 2ms, render: 14ms)
+ GET / 200 in 17ms (compile: 2ms, render: 14ms)
+ GET / 200 in 199ms (compile: 1835µs, render: 197ms)
+ GET /portal/bakery 200 in 460ms (compile: 412ms, render: 48ms)
+ GET / 200 in 45ms (compile: 3ms, render: 42ms)
+ GET / 200 in 35ms (compile: 3ms, render: 32ms)
+✓ Compiled in 235ms
+✓ Compiled in 141ms
+ GET / 200 in 73ms (compile: 45ms, render: 27ms)
+ GET / 200 in 14ms (compile: 1983µs, render: 12ms)
+✓ Compiled in 161ms
+ GET / 200 in 67ms (compile: 45ms, render: 21ms)
+ GET / 200 in 99ms (compile: 1974µs, render: 97ms)
+ GET / 200 in 16ms (compile: 1899µs, render: 14ms)
+ GET / 200 in 48ms (compile: 3ms, render: 45ms)
+✓ Compiled in 146ms

@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚀 Guía Paso a Paso: GitHub + Vercel</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            min-height: 100vh;
+            color: #e2e8f0;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            padding: 40px 20px;
+            background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
+            border-radius: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .step {
+            background: #1e293b;
+            border-radius: 16px;
+            margin-bottom: 20px;
+            overflow: hidden;
+            border: 1px solid #334155;
+        }
+        
+        .step-header {
+            background: linear-gradient(90deg, #7c3aed, #a855f7);
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .step-number {
+            width: 50px;
+            height: 50px;
+            background: white;
+            color: #7c3aed;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+        
+        .step-title {
+            font-size: 1.3em;
+            font-weight: 600;
+        }
+        
+        .step-content {
+            padding: 25px;
+        }
+        
+        .step-content p {
+            margin-bottom: 15px;
+            line-height: 1.7;
+        }
+        
+        .url-box {
+            background: #0f172a;
+            border: 2px solid #7c3aed;
+            border-radius: 10px;
+            padding: 15px 20px;
+            font-family: monospace;
+            font-size: 1.1em;
+            margin: 15px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .url-box a {
+            color: #a855f7;
+            text-decoration: none;
+        }
+        
+        .url-box a:hover {
+            text-decoration: underline;
+        }
+        
+        .screenshot {
+            background: #0f172a;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 1px solid #334155;
+        }
+        
+        .screenshot-header {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+        
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+        
+        .dot-red { background: #ef4444; }
+        .dot-yellow { background: #eab308; }
+        .dot-green { background: #22c55e; }
+        
+        .screenshot-content {
+            background: #1e293b;
+            border-radius: 8px;
+            padding: 20px;
+            min-height: 150px;
+        }
+        
+        .btn-mockup {
+            display: inline-block;
+            background: #22c55e;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            margin: 5px;
+        }
+        
+        .btn-mockup.purple {
+            background: #7c3aed;
+        }
+        
+        .btn-mockup.blue {
+            background: #3b82f6;
+        }
+        
+        .btn-mockup.white {
+            background: white;
+            color: #0f172a;
+        }
+        
+        .input-mockup {
+            background: #0f172a;
+            border: 1px solid #475569;
+            padding: 12px 16px;
+            border-radius: 8px;
+            color: #94a3b8;
+            width: 100%;
+            margin: 10px 0;
+        }
+        
+        .checkbox-mockup {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 10px 0;
+            padding: 10px;
+            background: #0f172a;
+            border-radius: 8px;
+        }
+        
+        .checkbox-mockup .box {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #475569;
+            border-radius: 4px;
+        }
+        
+        .checkbox-mockup .box.checked {
+            background: #7c3aed;
+            border-color: #7c3aed;
+        }
+        
+        .alert {
+            background: #1e3a5f;
+            border-left: 4px solid #3b82f6;
+            padding: 15px 20px;
+            border-radius: 0 10px 10px 0;
+            margin: 15px 0;
+        }
+        
+        .alert.warning {
+            background: #422006;
+            border-color: #f59e0b;
+        }
+        
+        .alert.success {
+            background: #14532d;
+            border-color: #22c55e;
+        }
+        
+        .arrow {
+            text-align: center;
+            font-size: 2em;
+            color: #7c3aed;
+            margin: 20px 0;
+        }
+        
+        .code-block {
+            background: #0f172a;
+            border-radius: 8px;
+            padding: 15px;
+            font-family: monospace;
+            overflow-x: auto;
+            margin: 15px 0;
+        }
+        
+        .code-block .comment {
+            color: #6b7280;
+        }
+        
+        .code-block .command {
+            color: #22c55e;
+        }
+        
+        .two-columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin: 15px 0;
+        }
+        
+        @media (max-width: 600px) {
+            .two-columns {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 1.8em;
+            }
+        }
+        
+        .final-step {
+            background: linear-gradient(135deg, #14532d 0%, #166534 100%);
+            border: 2px solid #22c55e;
+        }
+        
+        .final-step .step-header {
+            background: #22c55e;
+        }
+        
+        .final-step .step-number {
+            color: #22c55e;
+        }
+        
+        .repo-mockup {
+            background: #0f172a;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .repo-header {
+            background: #1e293b;
+            padding: 12px 15px;
+            border-bottom: 1px solid #334155;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .repo-icon {
+            color: #94a3b8;
+        }
+        
+        .repo-name {
+            color: #3b82f6;
+            font-weight: 500;
+        }
+        
+        .repo-body {
+            padding: 15px;
+        }
+        
+        .repo-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 0;
+            border-bottom: 1px solid #1e293b;
+        }
+        
+        .folder-icon {
+            color: #3b82f6;
+        }
+        
+        .file-icon {
+            color: #6b7280;
+        }
+        
+        .tag {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            margin-left: auto;
+        }
+        
+        .tag-yellow {
+            background: #422006;
+            color: #fbbf24;
+        }
+        
+        .tag-green {
+            background: #14532d;
+            color: #4ade80;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 Guía Paso a Paso</h1>
+            <p>Sube tu proyecto NexusOS a GitHub y despliégalo en Vercel</p>
+        </div>
+        
+        <!-- PASO 1: Crear cuenta GitHub -->
+        <div class="step">
+            <div class="step-header">
+                <div class="step-number">1</div>
+                <div class="step-title">Crear cuenta en GitHub (si no tienes)</div>
+            </div>
+            <div class="step-content">
+                <p>GitHub es donde se guarda tu código. Es gratis y necesario para Vercel.</p>
+                
+                <div class="url-box">
+                    🔗 <a href="https://github.com" target="_blank">https://github.com</a>
+                </div>
+                
+                <div class="screenshot">
+                    <div class="screenshot-header">
+                        <div class="dot dot-red"></div>
+                        <div class="dot dot-yellow"></div>
+                        <div class="dot dot-green"></div>
+                    </div>
+                    <div class="screenshot-content">
+                        <p style="margin-bottom: 15px;">Haz clic en <strong>"Sign up"</strong> arriba a la derecha</p>
+                        <div class="two-columns">
+                            <div>
+                                <div class="input-mockup">tu-email@ejemplo.com</div>
+                                <p style="font-size: 0.9em; color: #94a3b8;">Ingresa tu email</p>
+                            </div>
+                            <div>
+                                <div class="input-mockup">TuPassword123!</div>
+                                <p style="font-size: 0.9em; color: #94a3b8;">Crea una contraseña</p>
+                            </div>
+                        </div>
+                        <div class="btn-mockup" style="margin-top: 15px;">Create an account</div>
+                    </div>
+                </div>
+                
+                <div class="alert success">
+                    ✅ <strong>Tip:</strong> Si ya tienes cuenta en GitHub, salta al paso 2.
+                </div>
+            </div>
+        </div>
+        
+        <div class="arrow">↓</div>
+        
+        <!-- PASO 2: Crear repositorio -->
+        <div class="step">
+            <div class="step-header">
+                <div class="step-number">2</div>
+                <div class="step-title">Crear un nuevo repositorio</div>
+            </div>
+            <div class="step-content">
+                <p>Un "repositorio" es como una carpeta para tu proyecto en GitHub.</p>
+                
+                <div class="url-box">
+                    🔗 <a href="https://github.com/new" target="_blank">https://github.com/new</a>
+                    <span style="color: #94a3b8; margin-left: auto;">(clic directo)</span>
+                </div>
+                
+                <div class="screenshot">
+                    <div class="screenshot-header">
+                        <div class="dot dot-red"></div>
+                        <div class="dot dot-yellow"></div>
+                        <div class="dot dot-green"></div>
+                    </div>
+                    <div class="screenshot-content">
+                        <p style="margin-bottom: 15px; color: #94a3b8;">Create a new repository</p>
+                        
+                        <label style="color: #94a3b8; font-size: 0.9em;">Repository name *</label>
+                        <div class="input-mockup" style="border-color: #7c3aed;">NexusOS</div>
+                        
+                        <label style="color: #94a3b8; font-size: 0.9em; display: block; margin-top: 15px;">Description (optional)</label>
+                        <div class="input-mockup">Sistema multi-tenant para el Caribe</div>
+                        
+                        <div style="margin-top: 20px;">
+                            <div class="checkbox-mockup">
+                                <div class="box checked"></div>
+                                <span><strong>Public</strong> - Cualquiera puede ver (necesario para Vercel gratis)</span>
+                            </div>
+                            <div class="checkbox-mockup">
+                                <div class="box"></div>
+                                <span>Private - Solo tú puedes ver</span>
+                            </div>
+                        </div>
+                        
+                        <div class="alert warning" style="margin-top: 15px;">
+                            ⚠️ <strong>IMPORTANTE:</strong> DEJAS SIN MARCAR estas opciones:
+                            <ul style="margin-left: 20px; margin-top: 10px;">
+                                <li>Add a README file</li>
+                                <li>Add .gitignore</li>
+                                <li>Choose a license</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="btn-mockup purple" style="margin-top: 15px;">Create repository</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="arrow">↓</div>
+        
+        <!-- PASO 3: Copiar comandos -->
+        <div class="step">
+            <div class="step-header">
+                <div class="step-number">3</div>
+                <div class="step-title">Ejecutar comandos para subir el código</div>
+            </div>
+            <div class="step-content">
+                <p>Después de crear el repositorio, GitHub te mostrará una página con comandos. <strong>Ignórala</strong> y usa estos comandos que te daré aquí.</p>
+                
+                <p>Yo ejecutaré los comandos por ti. Solo necesito que me digas:</p>
+                
+                <div class="alert success">
+                    <strong>📝 Necesito que me des tu nombre de usuario de GitHub</strong>
+                    <p style="margin-top: 10px;">Por ejemplo: Si tu GitHub es <code>github.com/juanperez</code>, tu usuario es <strong>juanperez</strong></p>
+                </div>
+                
+                <p style="margin-top: 15px;">Cuando tengas tu usuario, los comandos serán:</p>
+                
+                <div class="code-block">
+                    <span class="comment"># Conectar tu proyecto con GitHub</span><br>
+                    <span class="command">git remote add origin https://github.com/TU-USUARIO/NexusOS.git</span><br><br>
+                    <span class="comment"># Subir el código</span><br>
+                    <span class="command">git push -u origin master</span>
+                </div>
+                
+                <div class="screenshot">
+                    <div class="screenshot-header">
+                        <div class="dot dot-red"></div>
+                        <div class="dot dot-yellow"></div>
+                        <div class="dot dot-green"></div>
+                    </div>
+                    <div class="screenshot-content">
+                        <div class="repo-mockup">
+                            <div class="repo-header">
+                                <span class="repo-icon">📁</span>
+                                <span class="repo-name">TU-USUARIO / NexusOS</span>
+                                <span class="tag tag-yellow">Public</span>
+                            </div>
+                            <div class="repo-body">
+                                <div class="repo-item">
+                                    <span class="folder-icon">📁</span>
+                                    <span>src/</span>
+                                    <span class="tag tag-green">Código fuente</span>
+                                </div>
+                                <div class="repo-item">
+                                    <span class="folder-icon">📁</span>
+                                    <span>prisma/</span>
+                                    <span class="tag tag-green">Base de datos</span>
+                                </div>
+                                <div class="repo-item">
+                                    <span class="file-icon">📄</span>
+                                    <span>package.json</span>
+                                </div>
+                                <div class="repo-item">
+                                    <span class="file-icon">📄</span>
+                                    <span>next.config.ts</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="arrow">↓</div>
+        
+        <!-- PASO 4: Conectar a Vercel -->
+        <div class="step final-step">
+            <div class="step-header">
+                <div class="step-number">4</div>
+                <div class="step-title">Conectar a Vercel y desplegar</div>
+            </div>
+            <div class="step-content">
+                <p>Una vez que tu código esté en GitHub, Vercel lo detectará automáticamente.</p>
+                
+                <div class="url-box">
+                    🔗 <a href="https://vercel.com/new" target="_blank">https://vercel.com/new</a>
+                </div>
+                
+                <div class="screenshot">
+                    <div class="screenshot-header">
+                        <div class="dot dot-red"></div>
+                        <div class="dot dot-yellow"></div>
+                        <div class="dot dot-green"></div>
+                    </div>
+                    <div class="screenshot-content">
+                        <p style="margin-bottom: 15px;"><strong>Paso 4a:</strong> Inicia sesión con GitHub</p>
+                        <div class="btn-mockup" style="background: #24292e;">
+                            <span style="margin-right: 10px;">🐱</span> Continue with GitHub
+                        </div>
+                        
+                        <p style="margin: 20px 0 15px;"><strong>Paso 4b:</strong> Verás tu repositorio NexusOS</p>
+                        <div class="repo-mockup">
+                            <div class="repo-header" style="cursor: pointer; background: #1e3a5f;">
+                                <span class="repo-icon">📦</span>
+                                <span class="repo-name">NexusOS</span>
+                                <span style="margin-left: auto; color: #22c55e;">Import →</span>
+                            </div>
+                        </div>
+                        
+                        <p style="margin: 20px 0 15px;"><strong>Paso 4c:</strong> Configura y despliega</p>
+                        <div class="input-mockup">Project Name: NexusOS</div>
+                        <p style="font-size: 0.9em; color: #94a3b8;">Framework Preset: Next.js (se detecta automáticamente)</p>
+                        
+                        <div class="btn-mockup" style="margin-top: 15px; background: #22c55e;">Deploy</div>
+                    </div>
+                </div>
+                
+                <div class="alert success" style="margin-top: 20px;">
+                    🎉 <strong>¡Listo!</strong> Vercel tardará 2-3 minutos en desplegar tu proyecto.
+                    <p style="margin-top: 10px;">Al terminar tendrás una URL como: <code>https://nexusos.vercel.app</code></p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- RESUMEN -->
+        <div class="step" style="margin-top: 30px; border: 2px solid #7c3aed;">
+            <div class="step-header" style="background: linear-gradient(90deg, #f59e0b, #eab308);">
+                <div class="step-number" style="color: #f59e0b;">📋</div>
+                <div class="step-title" style="color: #0f172a;">Resumen - Qué hacer AHORA</div>
+            </div>
+            <div class="step-content">
+                <ol style="margin-left: 20px; line-height: 2;">
+                    <li>Ve a <a href="https://github.com" style="color: #a855f7;">GitHub.com</a> y crea cuenta (si no tienes)</li>
+                    <li>Crea un repositorio público llamado <strong>"NexusOS"</strong></li>
+                    <li>Regresa aquí y dime tu <strong>nombre de usuario de GitHub</strong></li>
+                    <li>Yo ejecutaré los comandos para subir el código</li>
+                    <li>Ve a <a href="https://vercel.com" style="color: #a855f7;">Vercel.com</a> y conecta tu GitHub</li>
+                    <li>¡Tu proyecto estará en línea! 🚀</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

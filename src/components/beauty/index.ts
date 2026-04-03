@@ -1,0 +1,10 @@
+export { BeautyDashboard } from './beauty-dashboard';
+export { BeautyAppointments } from './beauty-appointments';
+export { BeautyClients } from './beauty-clients';
+export { BeautyStaff } from './beauty-staff';
+export { BeautyServices } from './beauty-services';
+export { BeautyPOS } from './beauty-pos';
+export { BeautyProducts } from './beauty-products';
+export { BeautyFinances } from './beauty-finances';
+export { BeautyReports } from './beauty-reports';
+export { BeautySettings } from './beauty-settings';

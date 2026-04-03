@@ -1,0 +1,573 @@
+
+// ============================================
+// BAKERY / PASTELERÍA - MODELOS COMPLETOS
+// ============================================
+
+// ===== PRODUCTOS =====
+model BakeryProduct {
+  id                String   @id @default(cuid())
+  tenantId          String
+  
+  // Información básica
+  sku               String
+  name              String
+  description       String?
+  category          String   @default("BREAD")
+  subcategory       String?
+  
+  // Precios
+  basePrice         Float
+  costPrice         Float    @default(0)
+  currency          String   @default("TTD")
+  
+  // Inventario
+  trackInventory    Boolean  @default(true)
+  stockQuantity     Float    @default(0)
+  minStock          Float    @default(0)
+  unit              String   @default("unidad")
+  
+  // Producción
+  productionTime    Int?
+  shelfLife         Int?
+  recipeId          String?
+  isCustomizable    Boolean  @default(false)
+  
+  // Presentación
+  imageUrl          String?
+  allergens         String?
+  nutritionalInfo   String?
+  
+  // Estado
+  isActive          Boolean  @default(true)
+  isFeatured        Boolean  @default(false)
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  @@unique([tenantId, sku])
+  @@index([tenantId])
+  @@index([category])
+  @@index([isActive])
+}
+
+model BakeryProductVariant {
+  id                String   @id @default(cuid())
+  tenantId          String
+  productId         String
+  
+  name              String
+  sku               String
+  priceModifier     Float    @default(0)
+  weight            Float?
+  portions          Int?
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  @@index([tenantId])
+  @@index([productId])
+}
+
+// ===== RECETAS Y PRODUCCIÓN =====
+model BakeryRecipe {
+  id                String   @id @default(cuid())
+  tenantId          String
+  
+  name              String
+  description       String?
+  portions          Int      @default(1)
+  prepTime          Int?
+  bakeTime          Int?
+  bakeTemp          Int?
+  instructions      String?
+  tips              String?
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  @@index([tenantId])
+}
+
+model BakeryRecipeIngredient {
+  id                String   @id @default(cuid())
+  tenantId          String
+  recipeId          String
+  ingredientId      String
+  
+  quantity          Float
+  unit              String
+  
+  createdAt         DateTime @default(now())
+  
+  @@index([tenantId])
+  @@index([recipeId])
+  @@index([ingredientId])
+}
+
+model BakeryIngredient {
+  id                String   @id @default(cuid())
+  tenantId          String
+  
+  sku               String?
+  name              String
+  category          String?
+  
+  // Inventario
+  currentStock      Float    @default(0)
+  minStock          Float    @default(0)
+  unit              String
+  
+  // Costos
+  unitCost          Float    @default(0)
+  currency          String   @default("TTD")
+  
+  // Proveedor
+  supplierId        String?
+  supplierSku       String?
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  @@index([tenantId])
+  @@index([name])
+}
+
+// ===== PEDIDOS =====
+model BakeryOrder {
+  id                String   @id @default(cuid())
+  tenantId          String
+  
+  orderNumber       String
+  orderType         String   @default("POS")
+  
+  // Cliente
+  customerId        String?
+  customerName      String
+  customerPhone     String?
+  customerEmail     String?
+  
+  // Entrega
+  deliveryType      String   @default("PICKUP")
+  deliveryAddress   String?
+  deliveryDate      String?
+  deliveryTime      String?
+  deliveryNotes     String?
+  
+  // Pedido especial (tortas)
+  isCustomOrder     Boolean  @default(false)
+  customDetails     String?
+  
+  // Montos
+  subtotal          Float
+  discount          Float    @default(0)
+  deliveryFee       Float    @default(0)
+  tax               Float    @default(0)
+  total             Float
+  currency          String   @default("TTD")
+  
+  // Pago
+  paymentStatus     String   @default("PENDING")
+  paymentMethod     String?
+  paymentReference  String?
+  
+  // Estado
+  status            String   @default("RECEIVED")
+  notes             String?
+  
+  // Producción
+  productionStatus  String?
+  productionNotes   String?
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  @@unique([tenantId, orderNumber])
+  @@index([tenantId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model BakeryOrderItem {
+  id                String   @id @default(cuid())
+  tenantId          String
+  orderId           String
+  
+  productId         String?
+  variantId         String?
+  
+  productName       String
+  variantName       String?
+  quantity          Float
+  unitPrice         Float
+  totalPrice        Float
+  
+  notes             String?
+  
+  createdAt         DateTime @default(now())
+  
+  @@index([tenantId])
+  @@index([orderId])
+}
+
+// ===== CLIENTES =====
+model BakeryCustomer {
+  id                String   @id @default(cuid())
+  tenantId          String
+  
+  name              String
+  email             String?
+  phone             String
+  address           String?
+  
+  // Fidelidad
+  loyaltyPoints     Int      @default(0)
+  loyaltyTier       String   @default("bronze")
+  totalPurchases    Float    @default(0)
+  ordersCount       Int      @default(0)
+  
+  // Cumpleaños
+  birthday          String?
+  
+  // Preferencias
+  preferences       String?
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  @@index([tenantId])
+  @@index([phone])
+}
+
+// ===== FACTURACIÓN =====
+model BakeryInvoice {
+  id                String   @id @default(cuid())
+  tenantId          String
+  
+  invoiceNumber     String
+  orderId           String?
+  
+  // Datos fiscales
+  customerTaxId     String?
+  customerName      String
+  customerAddress   String?
+  
+  // Montos
+  subtotal          Float
+  taxRate           Float    @default(0)
+  taxAmount         Float    @default(0)
+  total             Float
+  currency          String   @default("TTD")
+  
+  // Estado
+  status            String   @default("DRAFT")
+  paidAt            String?
+  
+  // PDF
+  pdfUrl            String?
+  
+  createdAt         DateTime @default(now())
+  
+  @@unique([tenantId, invoiceNumber])
+  @@index([tenantId])
+  @@index([status])
+}
+
+// ===== PRODUCCIÓN =====
+model BakeryProductionPlan {
+  id                String   @id @default(cuid())
+  tenantId          String
+  
+  date              String
+  shift             String?
+  
+  status            String   @default("SCHEDULED")
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  @@index([tenantId])
+  @@index([date])
+}
+
+model BakeryProductionItem {
+  id                String   @id @default(cuid())
+  tenantId          String
+  planId            String
+  productId         String?
+  
+  productName       String
+  quantity          Float
+  quantityProduced  Float    @default(0)
+  quantityWasted    Float    @default(0)
+  
+  assignedTo        String?
+  startTime         String?
+  endTime           String?
+  
+  notes             String?
+  
+  createdAt         DateTime @default(now())
+  
+  @@index([tenantId])
+  @@index([planId])
+}
+
+// ===== COMPRAS A PROVEEDORES =====
+model BakeryPurchaseOrder {
+  id                String   @id @default(cuid())
+  tenantId          String
+  
+  orderNumber       String
+  supplierId        String?
+  supplierName      String
+  
+  status            String   @default("DRAFT")
+  expectedDate      String?
+  receivedDate      String?
+  
+  subtotal          Float    @default(0)
+  tax               Float    @default(0)
+  total             Float    @default(0)
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  @@unique([tenantId, orderNumber])
+  @@index([tenantId])
+  @@index([status])
+}
+
+model BakeryPurchaseItem {
+  id                String   @id @default(cuid())
+  tenantId          String
+  purchaseOrderId   String
+  ingredientId      String?
+  
+  ingredientName    String
+  quantity          Float
+  unitCost          Float    @default(0)
+  totalCost         Float    @default(0)
+  
+  quantityReceived  Float    @default(0)
+  
+  createdAt         DateTime @default(now())
+  
+  @@index([tenantId])
+  @@index([purchaseOrderId])
+}
+
+// ===== CONTABILIDAD =====
+model BakeryJournalEntry {
+  id                String   @id @default(cuid())
+  tenantId          String
+  
+  entryNumber       String
+  date              String
+  description       String
+  
+  reference         String?
+  referenceType     String?
+  
+  isPosted          Boolean  @default(false)
+  postedAt          String?
+  
+  createdAt         DateTime @default(now())
+  
+  @@unique([tenantId, entryNumber])
+  @@index([tenantId])
+  @@index([date])
+}
+
+model BakeryJournalLine {
+  id                String   @id @default(cuid())
+  tenantId          String
+  entryId           String
+  
+  accountId         String
+  accountName       String
+  description       String?
+  
+  debit             Float    @default(0)
+  credit            Float    @default(0)
+  
+  createdAt         DateTime @default(now())
+  
+  @@index([tenantId])
+  @@index([entryId])
+}
+
+// ===== CAJA (POS) =====
+model BakeryCashRegister {
+  id                String   @id @default(cuid())
+  tenantId          String
+  
+  name              String
+  location          String?
+  
+  isOpen            Boolean  @default(false)
+  openedAt          String?
+  openedBy          String?
+  openingBalance    Float    @default(0)
+  
+  currentBalance    Float    @default(0)
+  
+  closedAt          String?
+  closedBy          String?
+  closingBalance    Float    @default(0)
+  difference        Float    @default(0)
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  @@index([tenantId])
+  @@index([isOpen])
+}
+
+model BakeryCashTransaction {
+  id                String   @id @default(cuid())
+  tenantId          String
+  registerId        String
+  
+  type              String
+  amount            Float
+  description       String?
+  
+  reference         String?
+  
+  createdAt         DateTime @default(now())
+  
+  @@index([tenantId])
+  @@index([registerId])
+}
+
+// ===== CONFIGURACIÓN FISCAL =====
+model BakeryTaxConfig {
+  id                String   @id @default(cuid())
+  tenantId          String
+  
+  name              String
+  rate              Float    @default(0)
+  
+  taxNumber         String?
+  taxIdType         String?
+  
+  isDefault         Boolean  @default(false)
+  isActive          Boolean  @default(true)
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  @@index([tenantId])
+}
+
+// ===== CONFIGURACIÓN DE PANADERÍA =====
+model BakerySettings {
+  id                String   @id @default(cuid())
+  tenantId          String   @unique
+  
+  bakeryName        String
+  legalName         String?
+  taxId             String?
+  
+  email             String?
+  phone             String?
+  website           String?
+  whatsapp          String?
+  
+  address           String?
+  city              String?
+  country           String   @default("Trinidad & Tobago")
+  
+  logoUrl           String?
+  primaryColor      String   @default("#F97316")
+  secondaryColor    String   @default("#FBBF24")
+  accentColor       String   @default("#78350F")
+  
+  currency          String   @default("TTD")
+  currencySymbol    String   @default("TT$")
+  
+  taxEnabled        Boolean  @default(false)
+  taxRate           Float    @default(0)
+  taxName           String?
+  taxNumber         String?
+  
+  defaultOpeningTime String  @default("06:00")
+  defaultClosingTime String  @default("20:00")
+  defaultWorkingDays String  @default("monday,tuesday,wednesday,thursday,friday,saturday,sunday")
+  
+  productionStart   String   @default("04:00")
+  lastOrderTime     String   @default("19:00")
+  
+  reminderEnabled   Boolean  @default(true)
+  reminderHours     Int      @default(24)
+  
+  loyaltyEnabled    Boolean  @default(false)
+  pointsPerDollar   Float    @default(1)
+  pointsRedeemRate  Float    @default(100)
+  
+  wiPayEnabled      Boolean  @default(false)
+  wiPayApiKey       String?
+  
+  offlineMode       Boolean  @default(true)
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  @@index([tenantId])
+}
+
+// ===== PROVEEDORES =====
+model BakerySupplier {
+  id                String   @id @default(cuid())
+  tenantId          String
+  
+  name              String
+  contactName       String?
+  email             String?
+  phone             String?
+  address           String?
+  
+  taxId             String?
+  paymentTerms      String?
+  
+  notes             String?
+  isActive          Boolean  @default(true)
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  @@index([tenantId])
+  @@index([name])
+}
+
+// ===== PERSONAL =====
+model BakeryStaff {
+  id                String   @id @default(cuid())
+  tenantId          String
+  
+  firstName         String
+  lastName          String
+  fullName          String
+  email             String?
+  phone             String?
+  
+  role              String   @default("BAKER")
+  position          String?
+  
+  workingHours      String?
+  workingDays       String?
+  
+  hourlyRate        Float?
+  salary            Float?
+  
+  isActive          Boolean  @default(true)
+  hireDate          String?
+  
+  avatarUrl         String?
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  @@index([tenantId])
+  @@index([isActive])
+}

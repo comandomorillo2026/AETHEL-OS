@@ -1,0 +1,11 @@
+export { LawDashboard } from "./law-dashboard";
+export { LawCases } from "./law-cases";
+export { LawClients } from "./law-clients";
+export { LawDocuments } from "./law-documents";
+export { LawBilling } from "./law-billing";
+export { LawTrust } from "./law-trust";
+export { LawTime } from "./law-time";
+export { LawCalendar } from "./law-calendar";
+export { LawReports } from "./law-reports";
+export { LawSettings } from "./law-settings";
+export { LawGlobalSearch } from "./law-global-search";

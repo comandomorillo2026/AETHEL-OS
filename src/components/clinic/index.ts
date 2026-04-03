@@ -1,0 +1,10 @@
+export { ClinicLayout } from './clinic-layout';
+export { ClinicDashboard } from './clinic-dashboard';
+export { PatientsModule } from './patients-module';
+export { ClinicSettingsModule as SettingsModule } from './settings-module';
+export { AppointmentsModule } from './appointments-module';
+export { BillingModule } from './billing-module';
+export { PrescriptionsModule } from './prescriptions-module';
+export { LabModule } from './lab-module';
+export { InventoryModule } from './inventory-module';
+export { ReportsModule } from './reports-module';

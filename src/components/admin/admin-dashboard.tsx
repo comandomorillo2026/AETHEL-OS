@@ -1,12 +1,10 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { AdminLayout } from './admin-layout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   TrendingUp, 
   TrendingDown, 
@@ -14,57 +12,26 @@ import {
   DollarSign, 
   Building2, 
   Activity,
-  Lock,
-  Globe,
-  DollarSign as PriceIcon,
-  Settings,
-  Shield,
-  Save,
-  Eye,
-  EyeOff,
-  Key,
-  Server,
-  Mail,
-  Bell,
   CheckCircle,
   AlertCircle,
   RefreshCw,
   Plus,
-  Trash2,
-  Edit3,
-  Copy,
-  ArrowLeft,
   Search,
-  Filter,
-  MoreVertical,
-  ExternalLink,
   X,
   ChevronRight,
   Stethoscope,
   Heart,
   Scale,
   Scissors,
-  Clock,
-  CheckCircle2,
-  XCircle,
-  Pause,
-  Play,
-  Database,
-  HardDrive,
-  Zap,
-  CreditCard,
+  Shield,
   Pill,
   ChefHat,
-  UserCheck
+  ExternalLink,
+  Pause,
+  Play,
 } from 'lucide-react';
 import Link from 'next/link';
-import { CapacityMetrics } from './capacity-metrics';
-import { AIAssistant, AIAssistantButton } from './ai-assistant';
-import { ScalabilityPlan } from './scalability-plan';
 import { CompetitiveAnalysis } from './competitive-analysis';
-import { DatabaseMonitor } from './database-monitor';
-import { TemplatesModule } from './templates-module';
-import { BroadcastsModule } from './broadcasts-module';
 
 // ============================================
 // STAT CARD COMPONENT
@@ -81,12 +48,12 @@ function StatCard({ title, value, change, trend, icon: Icon, color = '#F0B429' }
     <div className="glass-card p-5">
       <div className="flex items-start justify-between">
         <div>
-          <p className="text-[var(--text-mid)] text-sm">{title}</p>
-          <p className="text-2xl font-bold text-[var(--text-primary)] mt-1" style={{ fontFamily: 'var(--font-dm-mono)' }}>
+          <p className="text-[#9D7BEA] text-sm">{title}</p>
+          <p className="text-2xl font-bold text-[#EDE9FE] mt-1" style={{ fontFamily: 'var(--font-dm-mono)' }}>
             {value}
           </p>
           {change && (
-            <p className={`text-sm mt-2 flex items-center gap-1 ${trend === 'up' ? 'text-[var(--success)]' : 'text-[var(--error)]'}`}>
+            <p className={`text-sm mt-2 flex items-center gap-1 ${trend === 'up' ? 'text-[#34D399]' : 'text-[#F87171]'}`}>
               {trend === 'up' ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />}
               {change}
             </p>
@@ -101,401 +68,66 @@ function StatCard({ title, value, change, trend, icon: Icon, color = '#F0B429' }
 }
 
 // ============================================
-// CREATE TENANT WIZARD
-// ============================================
-function CreateTenantWizard({ onClose, onSuccess }: { onClose: () => void; onSuccess: () => void }) {
-  const [step, setStep] = useState(1);
-  const [formData, setFormData] = useState({
-    businessName: '',
-    ownerName: '',
-    email: '',
-    phone: '',
-    industry: '',
-    plan: 'GROWTH',
-    billingCycle: 'monthly',
-    notes: ''
-  });
-  const [isCreating, setIsCreating] = useState(false);
-
-  const industries = [
-    { value: 'clinic', label: 'Clínica / Centro Médico', icon: Stethoscope, color: '#22D3EE', prices: { starter: 1200, growth: 2200, premium: 3800 } },
-    { value: 'nurse', label: 'Enfermería / Home Care', icon: Heart, color: '#34D399', prices: { starter: 800, growth: 1500, premium: 2500 } },
-    { value: 'beauty', label: 'Salón de Belleza / SPA', icon: Scissors, color: '#EC4899', prices: { starter: 600, growth: 1100, premium: 1900 } },
-    { value: 'lawfirm', label: 'Bufete de Abogados', icon: Scale, color: '#C4A35A', prices: { starter: 1500, growth: 2800, premium: 4500 } },
-    { value: 'pharmacy', label: 'Farmacia', icon: Heart, color: '#8B5CF6', prices: { starter: 1800, growth: 3200, premium: 5000 } },
-    { value: 'insurance', label: 'Aseguradora', icon: Shield, color: '#F59E0B', prices: { starter: 8000, growth: 15000, premium: 28000 } },
-    { value: 'retail', label: 'Retail / Boutique', icon: Building2, color: '#3B82F6', prices: { starter: 700, growth: 1300, premium: 2200 } },
-    { value: 'bakery', label: 'Panadería / Pastelería', icon: Building2, color: '#F97316', prices: { starter: 500, growth: 900, premium: 1500 } },
-  ];
-
-  // Get selected industry for dynamic pricing
-  const selectedIndustry = industries.find(i => i.value === formData.industry);
-  const industryPrices = selectedIndustry?.prices || { starter: 800, growth: 1500, premium: 2800 };
-
-  const plans = [
-    { value: 'STARTER', label: 'Starter', price: `TT$${industryPrices.starter}/mes`, users: '1-2 usuarios' },
-    { value: 'GROWTH', label: 'Growth', price: `TT$${industryPrices.growth}/mes`, users: '3-5 usuarios', popular: true },
-    { value: 'PREMIUM', label: 'Premium', price: `TT$${industryPrices.premium}/mes`, users: '6+ usuarios' },
-  ];
-
-  const handleCreate = async () => {
-    setIsCreating(true);
-    try {
-      const response = await fetch('/api/admin/tenants', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          businessName: formData.businessName,
-          legalName: formData.businessName,
-          ownerName: formData.ownerName,
-          email: formData.email,
-          phone: formData.phone,
-          industry: formData.industry,
-          plan: formData.plan,
-          billingCycle: formData.billingCycle,
-          notes: formData.notes
-        })
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        alert(data.error || 'Error al crear inquilino');
-        setIsCreating(false);
-        return;
-      }
-
-      setIsCreating(false);
-      onSuccess();
-    } catch (error) {
-      console.error('Error creating tenant:', error);
-      alert('Error al crear inquilino');
-      setIsCreating(false);
-    }
-  };
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-      <div className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl bg-[#0A0820] border border-[rgba(167,139,250,0.2)] shadow-2xl">
-        {/* Header */}
-        <div className="sticky top-0 bg-[#0A0820] p-6 border-b border-[rgba(167,139,250,0.1)] flex items-center justify-between">
-          <div>
-            <h2 className="text-xl font-bold text-[var(--text-primary)]">Crear Nuevo Inquilino</h2>
-            <p className="text-sm text-[var(--text-mid)] mt-1">Paso {step} de 3</p>
-          </div>
-          <button onClick={onClose} className="text-[var(--text-dim)] hover:text-[var(--text-primary)]">
-            <X className="w-5 h-5" />
-          </button>
-        </div>
-
-        {/* Progress Bar */}
-        <div className="px-6 py-3 bg-[rgba(108,63,206,0.05)]">
-          <div className="flex items-center gap-2">
-            {[1, 2, 3].map((s) => (
-              <React.Fragment key={s}>
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
-                  s <= step 
-                    ? 'bg-[var(--nexus-gold)] text-white' 
-                    : 'bg-[var(--glass)] text-[var(--text-dim)]'
-                }`}>
-                  {s}
-                </div>
-                {s < 3 && <div className={`flex-1 h-1 rounded ${s < step ? 'bg-[var(--nexus-gold)]' : 'bg-[var(--glass)]'}`} />}
-              </React.Fragment>
-            ))}
-          </div>
-        </div>
-
-        {/* Content */}
-        <div className="p-6">
-          {step === 1 && (
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-[var(--text-primary)]">Información del Negocio</h3>
-              
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label className="text-[var(--text-mid)]">Nombre del Negocio *</Label>
-                  <Input
-                    value={formData.businessName}
-                    onChange={(e) => setFormData(prev => ({ ...prev, businessName: e.target.value }))}
-                    placeholder="Ej: Clínica San Fernando"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label className="text-[var(--text-mid)]">Propietario *</Label>
-                  <Input
-                    value={formData.ownerName}
-                    onChange={(e) => setFormData(prev => ({ ...prev, ownerName: e.target.value }))}
-                    placeholder="Ej: Dr. Juan Pérez"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label className="text-[var(--text-mid)]">Email *</Label>
-                  <Input
-                    type="email"
-                    value={formData.email}
-                    onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                    placeholder="contacto@negocio.com"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label className="text-[var(--text-mid)]">Teléfono *</Label>
-                  <Input
-                    value={formData.phone}
-                    onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
-                    placeholder="+1 868 XXX XXXX"
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label className="text-[var(--text-mid)]">Industria *</Label>
-                <div className="grid grid-cols-2 gap-3">
-                  {industries.map((ind) => (
-                    <button
-                      key={ind.value}
-                      type="button"
-                      onClick={() => setFormData(prev => ({ ...prev, industry: ind.value }))}
-                      className={`flex items-center gap-3 p-4 rounded-lg border transition-all ${
-                        formData.industry === ind.value
-                          ? 'border-[var(--nexus-gold)] bg-[rgba(240,180,41,0.1)]'
-                          : 'border-[var(--glass-border)] hover:border-[rgba(167,139,250,0.3)]'
-                      }`}
-                    >
-                      <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: `${ind.color}20` }}>
-                        <ind.icon className="w-5 h-5" style={{ color: ind.color }} />
-                      </div>
-                      <span className="text-sm text-[var(--text-primary)]">{ind.label}</span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
-          )}
-
-          {step === 2 && (
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-[var(--text-primary)]">Seleccionar Plan</h3>
-              
-              <div className="space-y-3">
-                {plans.map((plan) => (
-                  <button
-                    key={plan.value}
-                    type="button"
-                    onClick={() => setFormData(prev => ({ ...prev, plan: plan.value }))}
-                    className={`w-full flex items-center justify-between p-4 rounded-lg border transition-all ${
-                      formData.plan === plan.value
-                        ? 'border-[var(--nexus-gold)] bg-[rgba(240,180,41,0.1)]'
-                        : 'border-[var(--glass-border)] hover:border-[rgba(167,139,250,0.3)]'
-                    }`}
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
-                        formData.plan === plan.value ? 'border-[var(--nexus-gold)]' : 'border-[var(--text-dim)]'
-                      }`}>
-                        {formData.plan === plan.value && <div className="w-3 h-3 rounded-full bg-[var(--nexus-gold)]" />}
-                      </div>
-                      <div className="text-left">
-                        <div className="flex items-center gap-2">
-                          <span className="font-medium text-[var(--text-primary)]">{plan.label}</span>
-                          {plan.popular && (
-                            <span className="px-2 py-0.5 rounded text-xs bg-[var(--nexus-gold)] text-white">Popular</span>
-                          )}
-                        </div>
-                        <span className="text-sm text-[var(--text-dim)]">{plan.users}</span>
-                      </div>
-                    </div>
-                    <span className="font-semibold text-[var(--nexus-gold)]">{plan.price}</span>
-                  </button>
-                ))}
-              </div>
-
-              <div className="space-y-2">
-                <Label className="text-[var(--text-mid)]">Ciclo de Facturación</Label>
-                <div className="grid grid-cols-2 gap-3">
-                  <button
-                    type="button"
-                    onClick={() => setFormData(prev => ({ ...prev, billingCycle: 'monthly' }))}
-                    className={`p-3 rounded-lg border text-center transition-all ${
-                      formData.billingCycle === 'monthly'
-                        ? 'border-[var(--nexus-gold)] bg-[rgba(240,180,41,0.1)]'
-                        : 'border-[var(--glass-border)]'
-                    }`}
-                  >
-                    <span className="block font-medium text-[var(--text-primary)]">Mensual</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setFormData(prev => ({ ...prev, billingCycle: 'annual' }))}
-                    className={`p-3 rounded-lg border text-center transition-all ${
-                      formData.billingCycle === 'annual'
-                        ? 'border-[var(--success)] bg-[rgba(52,211,153,0.1)]'
-                        : 'border-[var(--glass-border)]'
-                    }`}
-                  >
-                    <span className="block font-medium text-[var(--text-primary)]">Anual</span>
-                    <span className="block text-xs text-[var(--success)]">Ahorra 15%</span>
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {step === 3 && (
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-[var(--text-primary)]">Confirmar y Crear</h3>
-              
-              <div className="p-4 rounded-lg bg-[var(--glass)] space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-[var(--text-mid)]">Negocio:</span>
-                  <span className="text-[var(--text-primary)] font-medium">{formData.businessName}</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-[var(--text-mid)]">Propietario:</span>
-                  <span className="text-[var(--text-primary)]">{formData.ownerName}</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-[var(--text-mid)]">Email:</span>
-                  <span className="text-[var(--text-primary)]">{formData.email}</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-[var(--text-mid)]">Industria:</span>
-                  <span className="text-[var(--text-primary)]">
-                    {industries.find(i => i.value === formData.industry)?.label}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-[var(--text-mid)]">Plan:</span>
-                  <span className="text-[var(--nexus-gold)] font-medium">{formData.plan}</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-[var(--text-mid)]">Facturación:</span>
-                  <span className="text-[var(--text-primary)]">
-                    {formData.billingCycle === 'monthly' ? 'Mensual' : 'Anual'}
-                  </span>
-                </div>
-              </div>
-
-              <div className="p-4 rounded-lg bg-[rgba(240,180,41,0.05)] border border-[var(--nexus-gold)]/20">
-                <p className="text-sm text-[var(--text-mid)]">
-                  <AlertCircle className="w-4 h-4 inline mr-2 text-[var(--nexus-gold)]" />
-                  El espacio de trabajo será creado en estado <strong className="text-[var(--text-primary)]">pendiente de activación</strong>. 
-                  El cliente podrá acceder una vez que confirmes el pago y actives su cuenta.
-                </p>
-              </div>
-
-              <div className="space-y-2">
-                <Label className="text-[var(--text-mid)]">Notas adicionales (opcional)</Label>
-                <textarea
-                  value={formData.notes}
-                  onChange={(e) => setFormData(prev => ({ ...prev, notes: e.target.value }))}
-                  className="w-full p-3 rounded-lg bg-[var(--glass)] border border-[var(--glass-border)] text-[var(--text-primary)] placeholder-[var(--text-dim)] focus:border-[var(--nexus-gold)] focus:outline-none"
-                  rows={3}
-                  placeholder="Instrucciones especiales, personalización, etc."
-                />
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Footer */}
-        <div className="sticky bottom-0 bg-[#0A0820] p-6 border-t border-[rgba(167,139,250,0.1)] flex justify-between">
-          <Button
-            variant="outline"
-            onClick={() => step > 1 ? setStep(step - 1) : onClose()}
-            disabled={isCreating}
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            {step > 1 ? 'Atrás' : 'Cancelar'}
-          </Button>
-          
-          {step < 3 ? (
-            <Button
-              onClick={() => setStep(step + 1)}
-              className="btn-gold"
-              disabled={!formData.businessName || !formData.ownerName || !formData.email || (step === 1 && !formData.industry)}
-            >
-              Continuar
-              <ChevronRight className="w-4 h-4 ml-2" />
-            </Button>
-          ) : (
-            <Button
-              onClick={handleCreate}
-              className="btn-gold"
-              disabled={isCreating}
-            >
-              {isCreating ? (
-                <>
-                  <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
-                  Creando...
-                </>
-              ) : (
-                <>
-                  <CheckCircle className="w-4 h-4 mr-2" />
-                  Crear Inquilino
-                </>
-              )}
-            </Button>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ============================================
 // TENANTS MANAGEMENT
 // ============================================
 function TenantsManagement() {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
-  const [showCreateWizard, setShowCreateWizard] = useState(false);
-  const [tenants, setTenants] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
 
-  // Fetch tenants from API
-  const fetchTenants = async () => {
-    try {
-      const response = await fetch('/api/admin/tenants');
-      const data = await response.json();
-      if (data.tenants) {
-        setTenants(data.tenants.map((t: any) => ({
-          id: t.id,
-          name: t.businessName,
-          industry: t.industrySlug,
-          owner: t.ownerName,
-          email: t.ownerEmail,
-          plan: t.planSlug?.toUpperCase() || 'GROWTH',
-          status: t.status,
-          users: t._count?.users || 0,
-          createdAt: new Date(t.createdAt).toLocaleDateString('es-ES'),
-          slug: t.slug
-        })));
-      }
-    } catch (error) {
-      console.error('Error fetching tenants:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Load tenants on mount
-  useEffect(() => {
-    fetchTenants();
-  }, []);
+  // Demo tenants data
+  const tenants = [
+    {
+      id: '1',
+      name: 'Clínica San Fernando',
+      industry: 'clinic',
+      owner: 'Dr. Juan Martínez',
+      email: 'contacto@clinicasanfernando.tt',
+      plan: 'GROWTH',
+      status: 'active',
+      users: 5,
+      createdAt: '15/01/2026',
+      lastLogin: 'Hoy, 9:45 AM',
+      location: 'San Fernando, Trinidad',
+      monthlyFee: 2200,
+    },
+    {
+      id: '2',
+      name: 'Bufete Pérez & Asociados',
+      industry: 'lawfirm',
+      owner: 'Carlos Pérez',
+      email: 'info@bufeteperez.tt',
+      plan: 'PREMIUM',
+      status: 'active',
+      users: 8,
+      createdAt: '20/12/2025',
+      lastLogin: 'Ayer, 4:30 PM',
+      location: 'Port of Spain, Trinidad',
+      monthlyFee: 4500,
+    },
+    {
+      id: '3',
+      name: 'Salón Bella Vista',
+      industry: 'beauty',
+      owner: 'Ana Gómez',
+      email: 'bella@vistatt.com',
+      plan: 'STARTER',
+      status: 'pending',
+      users: 2,
+      createdAt: '01/04/2026',
+      lastLogin: 'Nunca',
+      location: 'Chaguanas, Trinidad',
+      monthlyFee: 600,
+    },
+  ];
 
   const industryIcons: Record<string, React.ElementType> = {
     clinic: Stethoscope,
     nurse: Heart,
     beauty: Scissors,
     lawfirm: Scale,
-    pharmacy: Heart,
+    pharmacy: Pill,
     insurance: Shield,
-    retail: Building2,
-    bakery: Building2,
+    bakery: ChefHat,
   };
 
   const industryColors: Record<string, string> = {
@@ -505,27 +137,13 @@ function TenantsManagement() {
     lawfirm: '#C4A35A',
     pharmacy: '#8B5CF6',
     insurance: '#F59E0B',
-    retail: '#3B82F6',
     bakery: '#F97316',
   };
 
   const statusColors: Record<string, string> = {
-    active: 'bg-[var(--success)]/10 text-[var(--success)]',
-    pending: 'bg-[var(--nexus-gold)]/10 text-[var(--nexus-gold)]',
-    suspended: 'bg-[var(--error)]/10 text-[var(--error)]'
-  };
-
-  const handleToggleStatus = (id: string, currentStatus: string) => {
-    setTenants(prev => prev.map(t => {
-      if (t.id === id) {
-        let newStatus = currentStatus;
-        if (currentStatus === 'active') newStatus = 'suspended';
-        else if (currentStatus === 'pending') newStatus = 'active';
-        else newStatus = 'active';
-        return { ...t, status: newStatus };
-      }
-      return t;
-    }));
+    active: 'bg-[#34D399]/10 text-[#34D399]',
+    pending: 'bg-[#F0B429]/10 text-[#F0B429]',
+    suspended: 'bg-[#F87171]/10 text-[#F87171]'
   };
 
   const filteredTenants = tenants.filter(t => {
@@ -541,10 +159,10 @@ function TenantsManagement() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-xl font-bold text-[var(--text-primary)]">Gestión de Inquilinos</h2>
-          <p className="text-sm text-[var(--text-mid)]">Administra todos los espacios de trabajo</p>
+          <h2 className="text-xl font-bold text-[#EDE9FE]">Gestión de Inquilinos</h2>
+          <p className="text-sm text-[#9D7BEA]">Administra todos los espacios de trabajo</p>
         </div>
-        <Button onClick={() => setShowCreateWizard(true)} className="btn-gold">
+        <Button className="btn-gold">
           <Plus className="w-4 h-4 mr-2" />
           Crear Inquilino
         </Button>
@@ -553,12 +171,12 @@ function TenantsManagement() {
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-3">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-dim)]" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#9D7BEA]" />
           <Input
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Buscar por nombre, propietario o email..."
-            className="pl-10"
+            className="pl-10 bg-[rgba(108,63,206,0.07)] border-[rgba(167,139,250,0.2)] text-[#EDE9FE]"
           />
         </div>
         <div className="flex gap-2">
@@ -568,8 +186,8 @@ function TenantsManagement() {
               onClick={() => setStatusFilter(status)}
               className={`px-3 py-2 rounded-lg text-sm transition-colors ${
                 statusFilter === status
-                  ? 'bg-[var(--nexus-gold)] text-white'
-                  : 'bg-[var(--glass)] text-[var(--text-mid)] hover:text-[var(--text-primary)]'
+                  ? 'bg-[#F0B429] text-white'
+                  : 'bg-[rgba(108,63,206,0.07)] text-[#9D7BEA] hover:text-[#EDE9FE]'
               }`}
             >
               {status === 'all' ? 'Todos' : status === 'active' ? 'Activos' : status === 'pending' ? 'Pendientes' : 'Suspendidos'}
@@ -579,74 +197,86 @@ function TenantsManagement() {
       </div>
 
       {/* Tenants Grid */}
-      <div className="grid gap-4">
+      <div className="grid gap-6">
         {filteredTenants.map((tenant) => {
           const IconComponent = industryIcons[tenant.industry] || Building2;
           const iconColor = industryColors[tenant.industry] || '#9D7BEA';
           
           return (
-            <div key={tenant.id} className="p-4 rounded-xl bg-[var(--glass)] border border-[var(--glass-border)] hover:border-[rgba(167,139,250,0.3)] transition-all">
-              <div className="flex items-start justify-between">
+            <div key={tenant.id} className="p-6 rounded-xl bg-[rgba(14,12,31,0.7)] border border-[rgba(167,139,250,0.12)] hover:border-[rgba(167,139,250,0.3)] transition-all">
+              {/* Header Row */}
+              <div className="flex items-start justify-between mb-4">
                 <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ backgroundColor: `${iconColor}20` }}>
-                    <IconComponent className="w-6 h-6" style={{ color: iconColor }} />
+                  <div className="w-14 h-14 rounded-xl flex items-center justify-center" style={{ backgroundColor: `${iconColor}20` }}>
+                    <IconComponent className="w-7 h-7" style={{ color: iconColor }} />
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
-                      <h3 className="font-semibold text-[var(--text-primary)]">{tenant.name}</h3>
+                      <h3 className="text-lg font-semibold text-[#EDE9FE]">{tenant.name}</h3>
                       <span className={`px-2 py-0.5 rounded text-xs ${statusColors[tenant.status]}`}>
                         {tenant.status === 'active' ? 'Activo' : tenant.status === 'pending' ? 'Pendiente' : 'Suspendido'}
                       </span>
                     </div>
-                    <p className="text-sm text-[var(--text-mid)]">{tenant.owner} • {tenant.email}</p>
-                    <div className="flex items-center gap-4 mt-2">
-                      <span className="text-xs text-[var(--text-dim)]">Plan: <span className="text-[var(--nexus-gold)]">{tenant.plan}</span></span>
-                      <span className="text-xs text-[var(--text-dim)]">Usuarios: <span className="text-[var(--text-primary)]">{tenant.users}</span></span>
-                      <span className="text-xs text-[var(--text-dim)]">Creado: {tenant.createdAt}</span>
-                    </div>
+                    <p className="text-sm text-[#9D7BEA]">{tenant.owner} • {tenant.email}</p>
                   </div>
                 </div>
                 
                 <div className="flex items-center gap-2">
                   {tenant.status === 'pending' && (
-                    <Button
-                      onClick={() => handleToggleStatus(tenant.id, tenant.status)}
-                      className="btn-gold"
-                      size="sm"
-                    >
+                    <Button className="btn-gold" size="sm">
                       <CheckCircle className="w-4 h-4 mr-1" />
                       Activar
                     </Button>
                   )}
                   {tenant.status === 'active' && (
-                    <Button
-                      onClick={() => handleToggleStatus(tenant.id, tenant.status)}
-                      variant="outline"
-                      size="sm"
-                      className="text-[var(--error)] hover:text-[var(--error)]"
-                    >
+                    <Button variant="outline" size="sm" className="text-[#F87171] border-[#F87171]/30 hover:bg-[#F87171]/10">
                       <Pause className="w-4 h-4 mr-1" />
                       Suspender
                     </Button>
                   )}
-                  {tenant.status === 'suspended' && (
-                    <Button
-                      onClick={() => handleToggleStatus(tenant.id, tenant.status)}
-                      variant="outline"
-                      size="sm"
-                      className="text-[var(--success)] hover:text-[var(--success)]"
-                    >
-                      <Play className="w-4 h-4 mr-1" />
-                      Reactivar
-                    </Button>
-                  )}
                   <Link
                     href={`/${tenant.industry}`}
-                    className="p-2 rounded-lg hover:bg-[var(--glass)] text-[var(--text-dim)] hover:text-[var(--text-primary)]"
+                    className="p-2 rounded-lg hover:bg-[rgba(108,63,206,0.1)] text-[#9D7BEA] hover:text-[#EDE9FE]"
                     title="Ver espacio"
                   >
                     <ExternalLink className="w-4 h-4" />
                   </Link>
+                </div>
+              </div>
+
+              {/* Info Grid */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-4 rounded-lg bg-[rgba(108,63,206,0.05)]">
+                <div>
+                  <p className="text-xs text-[#9D7BEA] mb-1">Plan</p>
+                  <p className="text-sm font-medium text-[#F0B429]">{tenant.plan}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-[#9D7BEA] mb-1">Mensualidad</p>
+                  <p className="text-sm font-medium text-[#EDE9FE]">TT${tenant.monthlyFee}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-[#9D7BEA] mb-1">Usuarios</p>
+                  <p className="text-sm font-medium text-[#EDE9FE]">{tenant.users}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-[#9D7BEA] mb-1">Ubicación</p>
+                  <p className="text-sm font-medium text-[#EDE9FE]">{tenant.location}</p>
+                </div>
+              </div>
+
+              {/* Activity Row */}
+              <div className="flex items-center justify-between mt-4 pt-4 border-t border-[rgba(167,139,250,0.1)]">
+                <div className="flex items-center gap-6 text-xs text-[#9D7BEA]">
+                  <span>📅 Ingreso: {tenant.createdAt}</span>
+                  <span>🕐 Último acceso: {tenant.lastLogin}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Button variant="outline" size="sm" className="text-[#9D7BEA] border-[rgba(167,139,250,0.2)]">
+                    Crear Factura
+                  </Button>
+                  <Button variant="outline" size="sm" className="text-[#9D7BEA] border-[rgba(167,139,250,0.2)]">
+                    Ver Historial
+                  </Button>
                 </div>
               </div>
             </div>
@@ -654,34 +284,11 @@ function TenantsManagement() {
         })}
       </div>
 
-      {/* Create Tenant Wizard */}
-      {showCreateWizard && (
-        <CreateTenantWizard 
-          onClose={() => setShowCreateWizard(false)}
-          onSuccess={() => {
-            setShowCreateWizard(false);
-            fetchTenants(); // Refresh the list
-          }}
-        />
-      )}
-
-      {/* Loading State */}
-      {loading && (
-        <div className="text-center py-8">
-          <RefreshCw className="w-8 h-8 mx-auto text-[var(--nexus-gold)] animate-spin" />
-          <p className="text-[var(--text-mid)] mt-4">Cargando inquilinos...</p>
-        </div>
-      )}
-
       {/* Empty State */}
-      {!loading && tenants.length === 0 && (
+      {filteredTenants.length === 0 && (
         <div className="text-center py-12">
-          <Building2 className="w-12 h-12 mx-auto text-[var(--text-dim)]" />
-          <p className="text-[var(--text-mid)] mt-4">No hay inquilinos registrados</p>
-          <Button onClick={() => setShowCreateWizard(true)} className="btn-gold mt-4">
-            <Plus className="w-4 h-4 mr-2" />
-            Crear Primer Inquilino
-          </Button>
+          <Building2 className="w-12 h-12 mx-auto text-[#9D7BEA]" />
+          <p className="text-[#9D7BEA] mt-4">No se encontraron inquilinos</p>
         </div>
       )}
     </div>
@@ -693,56 +300,49 @@ function TenantsManagement() {
 // ============================================
 function OrdersManagement() {
   const orders = [
-    { id: 'NXS-2026-0001', business: 'Clínica San Fernando', plan: 'GROWTH', amount: 'TT$2,750', status: 'paid', date: '2024-03-15' },
-    { id: 'NXS-2026-0002', business: 'Bufete Pérez & Asoc.', plan: 'PREMIUM', amount: 'TT$4,050', status: 'pending', date: '2024-03-14' },
-    { id: 'NXS-2026-0003', business: 'Salón Bella Vista', plan: 'STARTER', amount: 'TT$2,050', status: 'paid', date: '2024-03-13' },
-    { id: 'NXS-2026-0004', business: 'Home Care Trinidad', plan: 'GROWTH', amount: 'TT$2,750', status: 'failed', date: '2024-03-12' },
+    { id: 'NXS-2026-0001', business: 'Clínica San Fernando', plan: 'GROWTH', amount: 'TT$2,750', status: 'paid', date: '2026-03-15' },
+    { id: 'NXS-2026-0002', business: 'Bufete Pérez & Asoc.', plan: 'PREMIUM', amount: 'TT$4,050', status: 'pending', date: '2026-03-14' },
+    { id: 'NXS-2026-0003', business: 'Salón Bella Vista', plan: 'STARTER', amount: 'TT$750', status: 'paid', date: '2026-03-13' },
   ];
 
   const statusColors: Record<string, string> = {
-    paid: 'bg-[var(--success)]/10 text-[var(--success)]',
-    pending: 'bg-[var(--nexus-gold)]/10 text-[var(--nexus-gold)]',
-    failed: 'bg-[var(--error)]/10 text-[var(--error)]'
+    paid: 'bg-[#34D399]/10 text-[#34D399]',
+    pending: 'bg-[#F0B429]/10 text-[#F0B429]',
+    failed: 'bg-[#F87171]/10 text-[#F87171]'
   };
 
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-xl font-bold text-[var(--text-primary)]">Órdenes de Compra</h2>
-        <p className="text-sm text-[var(--text-mid)]">Historial de transacciones y pagos</p>
+        <h2 className="text-xl font-bold text-[#EDE9FE]">Órdenes de Compra</h2>
+        <p className="text-sm text-[#9D7BEA]">Historial de transacciones y pagos</p>
       </div>
 
       <div className="glass-card overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr className="border-b border-[var(--glass-border)] bg-[var(--glass)]">
-                <th className="text-left py-3 px-4 text-sm font-medium text-[var(--text-mid)]">Orden</th>
-                <th className="text-left py-3 px-4 text-sm font-medium text-[var(--text-mid)]">Negocio</th>
-                <th className="text-left py-3 px-4 text-sm font-medium text-[var(--text-mid)]">Plan</th>
-                <th className="text-left py-3 px-4 text-sm font-medium text-[var(--text-mid)]">Monto</th>
-                <th className="text-left py-3 px-4 text-sm font-medium text-[var(--text-mid)]">Fecha</th>
-                <th className="text-left py-3 px-4 text-sm font-medium text-[var(--text-mid)]">Estado</th>
-                <th className="text-right py-3 px-4 text-sm font-medium text-[var(--text-mid)]">Acciones</th>
+              <tr className="border-b border-[rgba(167,139,250,0.1)] bg-[rgba(108,63,206,0.05)]">
+                <th className="text-left py-3 px-4 text-sm font-medium text-[#9D7BEA]">Orden</th>
+                <th className="text-left py-3 px-4 text-sm font-medium text-[#9D7BEA]">Negocio</th>
+                <th className="text-left py-3 px-4 text-sm font-medium text-[#9D7BEA]">Plan</th>
+                <th className="text-left py-3 px-4 text-sm font-medium text-[#9D7BEA]">Monto</th>
+                <th className="text-left py-3 px-4 text-sm font-medium text-[#9D7BEA]">Fecha</th>
+                <th className="text-left py-3 px-4 text-sm font-medium text-[#9D7BEA]">Estado</th>
               </tr>
             </thead>
             <tbody>
               {orders.map((order) => (
-                <tr key={order.id} className="border-b border-[var(--glass-border)] last:border-0 hover:bg-[var(--glass)]">
-                  <td className="py-3 px-4 text-sm text-[var(--nexus-violet-lite)] font-mono">{order.id}</td>
-                  <td className="py-3 px-4 text-sm text-[var(--text-primary)]">{order.business}</td>
-                  <td className="py-3 px-4 text-sm text-[var(--text-mid)]">{order.plan}</td>
-                  <td className="py-3 px-4 text-sm text-[var(--text-primary)] font-mono">{order.amount}</td>
-                  <td className="py-3 px-4 text-sm text-[var(--text-mid)]">{order.date}</td>
+                <tr key={order.id} className="border-b border-[rgba(167,139,250,0.05)] last:border-0 hover:bg-[rgba(108,63,206,0.03)]">
+                  <td className="py-3 px-4 text-sm text-[#B197FC] font-mono">{order.id}</td>
+                  <td className="py-3 px-4 text-sm text-[#EDE9FE]">{order.business}</td>
+                  <td className="py-3 px-4 text-sm text-[#9D7BEA]">{order.plan}</td>
+                  <td className="py-3 px-4 text-sm text-[#EDE9FE] font-mono">{order.amount}</td>
+                  <td className="py-3 px-4 text-sm text-[#9D7BEA]">{order.date}</td>
                   <td className="py-3 px-4">
                     <span className={`px-2 py-1 rounded text-xs ${statusColors[order.status]}`}>
                       {order.status === 'paid' ? 'Pagado' : order.status === 'pending' ? 'Pendiente' : 'Fallido'}
                     </span>
-                  </td>
-                  <td className="py-3 px-4 text-right">
-                    <Button variant="ghost" size="sm">
-                      <MoreVertical className="w-4 h-4" />
-                    </Button>
                   </td>
                 </tr>
               ))}
@@ -755,144 +355,108 @@ function OrdersManagement() {
 }
 
 // ============================================
-// PRICING CONFIGURATION
+// INDUSTRIES PREVIEW
 // ============================================
-function PricingConfiguration() {
-  const [prices, setPrices] = useState({
-    starter: { monthly: 800, annual: 680, activation: 1250 },
-    growth: { monthly: 1500, annual: 1275, activation: 1250 },
-    premium: { monthly: 2800, annual: 2380, activation: 1250 },
-  });
-  const [taxRate, setTaxRate] = useState(12.5);
-  const [saved, setSaved] = useState(false);
-
-  const handleSave = () => {
-    setSaved(true);
-    setTimeout(() => setSaved(false), 3000);
-  };
+function IndustriesPreview() {
+  const industries = [
+    { id: 'clinic', name: 'Clínica', icon: Stethoscope, color: '#22D3EE', href: '/clinic' },
+    { id: 'lawfirm', name: 'Bufete', icon: Scale, color: '#C4A35A', href: '/lawfirm' },
+    { id: 'beauty', name: 'Belleza', icon: Scissors, color: '#EC4899', href: '/beauty' },
+    { id: 'nurse', name: 'Enfermería', icon: Heart, color: '#34D399', href: '/nurse' },
+    { id: 'bakery', name: 'Panadería', icon: ChefHat, color: '#F97316', href: '/bakery' },
+    { id: 'pharmacy', name: 'Farmacia', icon: Pill, color: '#8B5CF6', href: '/pharmacy' },
+    { id: 'insurance', name: 'Aseguradora', icon: Shield, color: '#F59E0B', href: '/insurance' },
+  ];
 
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-xl font-bold text-[var(--text-primary)]">Configuración de Precios</h2>
-        <p className="text-sm text-[var(--text-mid)]">Ajusta los precios de los planes y tarifas</p>
+        <h2 className="text-xl font-bold text-[#EDE9FE]">Industrias</h2>
+        <p className="text-sm text-[#9D7BEA]">Acceso directo a módulos de prueba</p>
       </div>
 
-      {/* Global Settings */}
-      <div className="glass-card p-6">
-        <div className="flex items-center gap-3 mb-6">
-          <div className="w-10 h-10 rounded-lg bg-[var(--nexus-gold)]/10 flex items-center justify-center">
-            <DollarSign className="w-5 h-5 text-[var(--nexus-gold)]" />
-          </div>
-          <div>
-            <h3 className="text-lg font-semibold text-[var(--text-primary)]">Configuración Global</h3>
-            <p className="text-sm text-[var(--text-dim)]">Impuestos y descuentos</p>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="space-y-2">
-            <Label className="text-[var(--text-mid)]">Moneda</Label>
-            <select className="w-full h-10 px-3 rounded-lg bg-[var(--obsidian-3)] border border-[var(--glass-border)] text-[var(--text-primary)]">
-              <option value="TTD">TTD - Dólar Trinitense</option>
-              <option value="USD">USD - Dólar Americano</option>
-            </select>
-          </div>
-          <div className="space-y-2">
-            <Label className="text-[var(--text-mid)]">Impuesto (%)</Label>
-            <Input
-              type="number"
-              value={taxRate}
-              onChange={(e) => setTaxRate(parseFloat(e.target.value))}
-              step="0.5"
-              className="font-mono"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label className="text-[var(--text-mid)]">Descuento Anual (%)</Label>
-            <Input
-              type="number"
-              defaultValue="15"
-              className="font-mono"
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* Plans Pricing */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {Object.entries(prices).map(([plan, pricing]) => (
-          <div key={plan} className="glass-card p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-bold text-[var(--text-primary)] uppercase">{plan}</h3>
-              {plan === 'growth' && (
-                <span className="px-2 py-1 rounded text-xs bg-[var(--nexus-gold)]/10 text-[var(--nexus-gold)]">
-                  Popular
-                </span>
-              )}
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        {industries.map((ind) => (
+          <Link
+            key={ind.id}
+            href={ind.href}
+            className="p-6 rounded-xl bg-[rgba(14,12,31,0.7)] border border-[rgba(167,139,250,0.12)] hover:border-[rgba(167,139,250,0.3)] transition-all hover:scale-[1.02] text-center"
+          >
+            <div className="w-12 h-12 rounded-xl mx-auto mb-3 flex items-center justify-center" style={{ backgroundColor: `${ind.color}20` }}>
+              <ind.icon className="w-6 h-6" style={{ color: ind.color }} />
             </div>
-
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label className="text-[var(--text-mid)] text-sm">Mensual (TT$)</Label>
-                <Input
-                  type="number"
-                  value={pricing.monthly}
-                  onChange={(e) => setPrices(prev => ({
-                    ...prev,
-                    [plan]: { ...prev[plan as keyof typeof prev], monthly: parseFloat(e.target.value) }
-                  }))}
-                  className="font-mono"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label className="text-[var(--text-mid)] text-sm">Anual (TT$)</Label>
-                <Input
-                  type="number"
-                  value={pricing.annual}
-                  onChange={(e) => setPrices(prev => ({
-                    ...prev,
-                    [plan]: { ...prev[plan as keyof typeof prev], annual: parseFloat(e.target.value) }
-                  }))}
-                  className="font-mono"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label className="text-[var(--text-mid)] text-sm">Activación (TT$)</Label>
-                <Input
-                  type="number"
-                  value={pricing.activation}
-                  onChange={(e) => setPrices(prev => ({
-                    ...prev,
-                    [plan]: { ...prev[plan as keyof typeof prev], activation: parseFloat(e.target.value) }
-                  }))}
-                  className="font-mono"
-                />
-              </div>
-            </div>
-
-            <div className="mt-4 pt-4 border-t border-[var(--glass-border)]">
-              <div className="flex justify-between text-xs text-[var(--text-dim)]">
-                <span>Con impuesto:</span>
-                <span className="font-mono text-[var(--text-primary)]">
-                  TT${(pricing.monthly * (1 + taxRate / 100)).toFixed(0)}
-                </span>
-              </div>
-            </div>
-          </div>
+            <p className="text-[#EDE9FE] font-medium">{ind.name}</p>
+          </Link>
         ))}
       </div>
+    </div>
+  );
+}
 
-      {saved && (
-        <div className="flex items-center gap-2 text-[var(--success)] text-sm">
-          <CheckCircle className="w-4 h-4" />
-          Precios actualizados exitosamente
-        </div>
-      )}
+// ============================================
+// PRICING CONFIGURATION
+// ============================================
+function PricingConfiguration() {
+  const industryPrices = [
+    { industry: 'Panadería', starter: 500, growth: 900, premium: 1500 },
+    { industry: 'Belleza', starter: 600, growth: 1100, premium: 1900 },
+    { industry: 'Enfermería', starter: 800, growth: 1500, premium: 2500 },
+    { industry: 'Clínica', starter: 1200, growth: 2200, premium: 3800 },
+    { industry: 'Bufete', starter: 1500, growth: 2800, premium: 4500 },
+    { industry: 'Farmacia', starter: 1800, growth: 3200, premium: 5000 },
+    { industry: 'Aseguradora', starter: 8000, growth: 15000, premium: 28000 },
+  ];
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <h2 className="text-xl font-bold text-[#EDE9FE]">Configuración de Precios por Industria</h2>
+        <p className="text-sm text-[#9D7BEA]">Precios mensuales en TT$</p>
+      </div>
+
+      <div className="glass-card overflow-hidden">
+        <table className="w-full">
+          <thead>
+            <tr className="border-b border-[rgba(167,139,250,0.1)] bg-[rgba(108,63,206,0.05)]">
+              <th className="text-left py-3 px-4 text-sm font-medium text-[#9D7BEA]">Industria</th>
+              <th className="text-center py-3 px-4 text-sm font-medium text-[#9D7BEA]">Starter</th>
+              <th className="text-center py-3 px-4 text-sm font-medium text-[#F0B429]">Growth</th>
+              <th className="text-center py-3 px-4 text-sm font-medium text-[#9D7BEA]">Premium</th>
+            </tr>
+          </thead>
+          <tbody>
+            {industryPrices.map((item, idx) => (
+              <tr key={idx} className="border-b border-[rgba(167,139,250,0.05)] last:border-0 hover:bg-[rgba(108,63,206,0.03)]">
+                <td className="py-3 px-4 text-sm text-[#EDE9FE] font-medium">{item.industry}</td>
+                <td className="py-3 px-4 text-center">
+                  <input
+                    type="number"
+                    defaultValue={item.starter}
+                    className="w-24 text-center bg-[rgba(108,63,206,0.07)] border border-[rgba(167,139,250,0.2)] rounded px-2 py-1 text-sm text-[#EDE9FE]"
+                  />
+                </td>
+                <td className="py-3 px-4 text-center">
+                  <input
+                    type="number"
+                    defaultValue={item.growth}
+                    className="w-24 text-center bg-[rgba(240,180,41,0.05)] border border-[#F0B429]/30 rounded px-2 py-1 text-sm text-[#F0B429] font-medium"
+                  />
+                </td>
+                <td className="py-3 px-4 text-center">
+                  <input
+                    type="number"
+                    defaultValue={item.premium}
+                    className="w-24 text-center bg-[rgba(108,63,206,0.07)] border border-[rgba(167,139,250,0.2)] rounded px-2 py-1 text-sm text-[#EDE9FE]"
+                  />
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
 
       <div className="flex justify-end">
-        <Button onClick={handleSave} className="btn-gold">
-          <Save className="w-4 h-4 mr-2" />
+        <Button className="btn-gold">
           Guardar Cambios
         </Button>
       </div>
@@ -901,150 +465,33 @@ function PricingConfiguration() {
 }
 
 // ============================================
-// SYSTEM SETTINGS
+// PLACEHOLDER MODULES
 // ============================================
-function SystemSettings() {
-  const [settings, setSettings] = useState({
-    siteName: 'NexusOS',
-    supportEmail: 'soporte@nexusos.tt',
-    timezone: 'America/Port_of_Spain',
-    language: 'es',
-    maintenanceMode: false,
-    registrationEnabled: true,
-    emailNotifications: true,
-    twoFactorRequired: false,
-  });
-  const [saved, setSaved] = useState(false);
-
-  const handleSave = () => {
-    setSaved(true);
-    setTimeout(() => setSaved(false), 3000);
-  };
-
+function PlaceholderModule({ name, description }: { name: string; description: string }) {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-xl font-bold text-[var(--text-primary)]">Configuración del Sistema</h2>
-        <p className="text-sm text-[var(--text-mid)]">Ajustes generales y de seguridad</p>
+        <h2 className="text-xl font-bold text-[#EDE9FE]">{name}</h2>
+        <p className="text-sm text-[#9D7BEA]">{description}</p>
       </div>
-
-      {/* General Settings */}
-      <div className="glass-card p-6">
-        <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-4">General</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="space-y-2">
-            <Label className="text-[var(--text-mid)]">Nombre del Sitio</Label>
-            <Input
-              value={settings.siteName}
-              onChange={(e) => setSettings(prev => ({ ...prev, siteName: e.target.value }))}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label className="text-[var(--text-mid)]">Email de Soporte</Label>
-            <Input
-              type="email"
-              value={settings.supportEmail}
-              onChange={(e) => setSettings(prev => ({ ...prev, supportEmail: e.target.value }))}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label className="text-[var(--text-mid)]">Zona Horaria</Label>
-            <select 
-              value={settings.timezone}
-              onChange={(e) => setSettings(prev => ({ ...prev, timezone: e.target.value }))}
-              className="w-full h-10 px-3 rounded-lg bg-[var(--obsidian-3)] border border-[var(--glass-border)] text-[var(--text-primary)]"
-            >
-              <option value="America/Port_of_Spain">América/Puerto España (AST)</option>
-              <option value="America/New_York">América/Nueva York (EST)</option>
-              <option value="UTC">UTC</option>
-            </select>
-          </div>
-          <div className="space-y-2">
-            <Label className="text-[var(--text-mid)]">Idioma</Label>
-            <select 
-              value={settings.language}
-              onChange={(e) => setSettings(prev => ({ ...prev, language: e.target.value }))}
-              className="w-full h-10 px-3 rounded-lg bg-[var(--obsidian-3)] border border-[var(--glass-border)] text-[var(--text-primary)]"
-            >
-              <option value="es">Español</option>
-              <option value="en">English</option>
-            </select>
-          </div>
-        </div>
-      </div>
-
-      {/* Security Settings */}
-      <div className="glass-card p-6">
-        <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-4">Seguridad</h3>
-        <div className="space-y-4">
-          <div className="flex items-center justify-between p-4 rounded-lg bg-[var(--glass)]">
-            <div>
-              <p className="text-[var(--text-primary)]">Autenticación de Dos Factores</p>
-              <p className="text-xs text-[var(--text-dim)]">Requerir 2FA para todos los usuarios</p>
-            </div>
-            <Switch
-              checked={settings.twoFactorRequired}
-              onCheckedChange={(checked) => setSettings(prev => ({ ...prev, twoFactorRequired: checked }))}
-            />
-          </div>
-          <div className="flex items-center justify-between p-4 rounded-lg bg-[var(--glass)]">
-            <div>
-              <p className="text-[var(--text-primary)]">Registro de Usuarios</p>
-              <p className="text-xs text-[var(--text-dim)]">Permitir auto-registro</p>
-            </div>
-            <Switch
-              checked={settings.registrationEnabled}
-              onCheckedChange={(checked) => setSettings(prev => ({ ...prev, registrationEnabled: checked }))}
-            />
-          </div>
-          <div className="flex items-center justify-between p-4 rounded-lg bg-[var(--glass)]">
-            <div>
-              <p className="text-[var(--text-primary)]">Modo Mantenimiento</p>
-              <p className="text-xs text-[var(--text-dim)]">Desactivar acceso temporalmente</p>
-            </div>
-            <Switch
-              checked={settings.maintenanceMode}
-              onCheckedChange={(checked) => setSettings(prev => ({ ...prev, maintenanceMode: checked }))}
-            />
-          </div>
-        </div>
-      </div>
-
-      {saved && (
-        <div className="flex items-center gap-2 text-[var(--success)] text-sm">
-          <CheckCircle className="w-4 h-4" />
-          Configuración guardada exitosamente
-        </div>
-      )}
-
-      <div className="flex justify-end">
-        <Button onClick={handleSave} className="btn-gold">
-          <Save className="w-4 h-4 mr-2" />
-          Guardar Configuración
-        </Button>
+      <div className="glass-card p-12 text-center">
+        <p className="text-[#9D7BEA]">Módulo en desarrollo...</p>
       </div>
     </div>
   );
 }
 
 // ============================================
-// MAIN ADMIN DASHBOARD
+// MAIN DASHBOARD COMPONENT
 // ============================================
 export function AdminDashboard() {
   const [activeTab, setActiveTab] = useState('dashboard');
-  const [showCreateTenant, setShowCreateTenant] = useState(false);
-  const [showAIAssistant, setShowAIAssistant] = useState(false);
 
-  // Listen for tab change events from sidebar
-  useEffect(() => {
+  // Listen for navigation events from sidebar
+  React.useEffect(() => {
     const handleTabChange = (e: CustomEvent) => {
-      if (e.detail === 'create-tenant') {
-        setShowCreateTenant(true);
-      } else {
-        setActiveTab(e.detail);
-      }
+      setActiveTab(e.detail);
     };
-
     window.addEventListener('adminTabChange', handleTabChange as EventListener);
     return () => window.removeEventListener('adminTabChange', handleTabChange as EventListener);
   }, []);
@@ -1052,418 +499,72 @@ export function AdminDashboard() {
   const renderContent = () => {
     switch (activeTab) {
       case 'dashboard':
-        return <DashboardOverview />;
+        return (
+          <div className="space-y-6">
+            {/* Stats Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <StatCard title="Inquilinos Activos" value="12" change="+2 este mes" trend="up" icon={Users} color="#34D399" />
+              <StatCard title="Ingresos Mensuales" value="TT$45,200" change="+15%" trend="up" icon={DollarSign} color="#F0B429" />
+              <StatCard title="Órdenes Pendientes" value="3" icon={Activity} color="#22D3EE" />
+              <StatCard title="Industrias" value="7" icon={Building2} color="#EC4899" />
+            </div>
+
+            {/* Recent Activity */}
+            <div className="glass-card p-6">
+              <h3 className="text-lg font-semibold text-[#EDE9FE] mb-4">Actividad Reciente</h3>
+              <div className="space-y-3">
+                {[
+                  { action: 'Nuevo inquilino registrado', business: 'Salón Bella Vista', time: 'Hace 2 horas' },
+                  { action: 'Pago recibido', business: 'Clínica San Fernando', time: 'Hace 5 horas' },
+                  { action: 'Cuenta activada', business: 'Bufete Pérez & Asoc.', time: 'Hace 1 día' },
+                ].map((item, idx) => (
+                  <div key={idx} className="flex items-center justify-between py-2 border-b border-[rgba(167,139,250,0.1)] last:border-0">
+                    <div className="flex items-center gap-3">
+                      <div className="w-2 h-2 rounded-full bg-[#34D399]" />
+                      <span className="text-sm text-[#EDE9FE]">{item.action}</span>
+                      <span className="text-sm text-[#F0B429]">{item.business}</span>
+                    </div>
+                    <span className="text-xs text-[#9D7BEA]">{item.time}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        );
       case 'orders':
         return <OrdersManagement />;
       case 'tenants':
         return <TenantsManagement />;
       case 'industries':
-        return <IndustriesPanel />;
+        return <IndustriesPreview />;
       case 'competitive':
         return <CompetitiveAnalysis />;
-      case 'scalability':
-        return <ScalabilityPlan />;
-      case 'database':
-        return <DatabaseMonitor />;
-      case 'users':
-        return <UsersManagement />;
       case 'pricing':
         return <PricingConfiguration />;
       case 'templates':
-        return <TemplatesModule />;
+        return <PlaceholderModule name="Templates" description="Plantillas de facturas, recibos y emails" />;
       case 'broadcasts':
-        return <BroadcastsModule />;
+        return <PlaceholderModule name="Comunicados" description="Envía mensajes masivos a inquilinos" />;
+      case 'scalability':
+        return <PlaceholderModule name="Escalabilidad" description="Métricas y plan de escalabilidad" />;
+      case 'database':
+        return <PlaceholderModule name="Base de Datos" description="Monitoreo de base de datos" />;
+      case 'users':
+        return <PlaceholderModule name="Usuarios" description="Gestión de usuarios del sistema" />;
       case 'settings':
-        return <SystemSettings />;
+        return <PlaceholderModule name="Configuración" description="Ajustes del sistema" />;
+      case 'create-tenant':
+        return <PlaceholderModule name="Crear Inquilino" description="Wizard de creación de inquilinos" />;
       default:
-        return <DashboardOverview />;
+        return <OrdersManagement />;
     }
   };
 
   return (
-    <>
-      <AdminLayout activeTab={activeTab}>
-        {renderContent()}
-      </AdminLayout>
-      
-      {showCreateTenant && (
-        <CreateTenantWizard 
-          onClose={() => setShowCreateTenant(false)}
-          onSuccess={() => {
-            setShowCreateTenant(false);
-            setActiveTab('tenants');
-          }}
-        />
-      )}
-
-      {/* AI Assistant - Solo para SUPER_ADMIN */}
-      <AIAssistantButton 
-        onClick={() => setShowAIAssistant(true)} 
-        isOpen={showAIAssistant} 
-      />
-      <AIAssistant 
-        isOpen={showAIAssistant} 
-        onClose={() => setShowAIAssistant(false)} 
-      />
-    </>
+    <AdminLayout activeTab={activeTab} onTabChange={setActiveTab}>
+      {renderContent()}
+    </AdminLayout>
   );
 }
 
-// ============================================
-// INDUSTRIES PANEL
-// ============================================
-function IndustriesPanel() {
-  const [tenants, setTenants] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  // Fetch tenants to calculate industry stats
-  useEffect(() => {
-    const fetchTenants = async () => {
-      try {
-        const response = await fetch('/api/admin/tenants');
-        const data = await response.json();
-        if (data.tenants) {
-          setTenants(data.tenants);
-        }
-      } catch (error) {
-        console.error('Error fetching tenants:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchTenants();
-  }, []);
-
-  const industries = [
-    { slug: 'clinic', name: 'Clínica Médica', icon: Stethoscope, color: '#22D3EE', route: '/clinic' },
-    { slug: 'nurse', name: 'Enfermería', icon: Heart, color: '#34D399', route: '/nurse' },
-    { slug: 'beauty', name: 'Salón de Belleza', icon: Scissors, color: '#EC4899', route: '/beauty' },
-    { slug: 'lawfirm', name: 'Bufete de Abogados', icon: Scale, color: '#C4A35A', route: '/lawfirm' },
-    { slug: 'bakery', name: 'Panadería/Pastelería', icon: ChefHat, color: '#F97316', route: '/bakery' },
-    { slug: 'pharmacy', name: 'Farmacia', icon: Pill, color: '#8B5CF6', route: '/pharmacy' },
-    { slug: 'insurance', name: 'Seguros', icon: Shield, color: '#F59E0B', route: '/insurance' },
-  ];
-
-  // Calculate stats for each industry
-  const getIndustryStats = (slug: string) => {
-    const industryTenants = tenants.filter((t: any) => t.industrySlug === slug);
-    return {
-      tenantCount: industryTenants.length,
-      activeUsers: industryTenants.reduce((sum: number, t: any) => sum + (t._count?.users || 0), 0),
-      activeCount: industryTenants.filter((t: any) => t.status === 'active').length,
-      pendingCount: industryTenants.filter((t: any) => t.status === 'pending').length,
-      suspendedCount: industryTenants.filter((t: any) => t.status === 'suspended').length,
-    };
-  };
-
-  const getStatusBadge = (stats: { activeCount: number; pendingCount: number; suspendedCount: number; tenantCount: number }) => {
-    if (stats.tenantCount === 0) {
-      return { label: 'Sin actividad', className: 'bg-[var(--text-dim)]/10 text-[var(--text-dim)]' };
-    }
-    if (stats.activeCount > 0) {
-      return { label: 'Activo', className: 'bg-[var(--success)]/10 text-[var(--success)]' };
-    }
-    if (stats.pendingCount > 0) {
-      return { label: 'Pendiente', className: 'bg-[var(--nexus-gold)]/10 text-[var(--nexus-gold)]' };
-    }
-    return { label: 'Suspendido', className: 'bg-[var(--error)]/10 text-[var(--error)]' };
-  };
-
-  return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-bold text-[var(--text-primary)]">Industrias</h2>
-          <p className="text-[var(--text-mid)]">Gestiona todas las industrias disponibles en NexusOS</p>
-        </div>
-        <div className="flex items-center gap-4">
-          <div className="text-right">
-            <p className="text-sm text-[var(--text-dim)]">Total Industrias</p>
-            <p className="text-2xl font-bold text-[var(--nexus-gold)]">{industries.length}</p>
-          </div>
-          <div className="text-right">
-            <p className="text-sm text-[var(--text-dim)]">Total Inquilinos</p>
-            <p className="text-2xl font-bold text-[var(--text-primary)]">{tenants.length}</p>
-          </div>
-        </div>
-      </div>
-
-      {/* Loading State */}
-      {loading && (
-        <div className="text-center py-12">
-          <RefreshCw className="w-8 h-8 mx-auto text-[var(--nexus-gold)] animate-spin" />
-          <p className="text-[var(--text-mid)] mt-4">Cargando estadísticas...</p>
-        </div>
-      )}
-
-      {/* Industries Grid */}
-      {!loading && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-          {industries.map((industry) => {
-            const stats = getIndustryStats(industry.slug);
-            const statusBadge = getStatusBadge(stats);
-            
-            return (
-              <Link
-                key={industry.slug}
-                href={industry.route}
-                className="group p-5 rounded-xl bg-[var(--glass)] border border-[var(--glass-border)] hover:border-[rgba(167,139,250,0.3)] transition-all"
-              >
-                {/* Header */}
-                <div className="flex items-start justify-between mb-4">
-                  <div 
-                    className="w-12 h-12 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform"
-                    style={{ backgroundColor: `${industry.color}20` }}
-                  >
-                    <industry.icon className="w-6 h-6" style={{ color: industry.color }} />
-                  </div>
-                  <span className={`px-2 py-1 rounded text-xs ${statusBadge.className}`}>
-                    {statusBadge.label}
-                  </span>
-                </div>
-
-                {/* Name */}
-                <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-3">
-                  {industry.name}
-                </h3>
-
-                {/* Stats */}
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-[var(--text-dim)]">Inquilinos</span>
-                    <span className="text-[var(--text-primary)] font-medium">{stats.tenantCount}</span>
-                  </div>
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-[var(--text-dim)]">Usuarios activos</span>
-                    <span className="text-[var(--text-primary)] font-medium">{stats.activeUsers}</span>
-                  </div>
-                </div>
-
-                {/* Footer */}
-                <div className="mt-4 pt-3 border-t border-[var(--glass-border)] flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    {stats.activeCount > 0 && (
-                      <span className="flex items-center gap-1 text-xs text-[var(--success)]">
-                        <CheckCircle className="w-3 h-3" />
-                        {stats.activeCount}
-                      </span>
-                    )}
-                    {stats.pendingCount > 0 && (
-                      <span className="flex items-center gap-1 text-xs text-[var(--nexus-gold)]">
-                        <Clock className="w-3 h-3" />
-                        {stats.pendingCount}
-                      </span>
-                    )}
-                    {stats.suspendedCount > 0 && (
-                      <span className="flex items-center gap-1 text-xs text-[var(--error)]">
-                        <XCircle className="w-3 h-3" />
-                        {stats.suspendedCount}
-                      </span>
-                    )}
-                  </div>
-                  <ChevronRight className="w-4 h-4 text-[var(--text-dim)] group-hover:text-[var(--nexus-gold)] transition-colors" />
-                </div>
-              </Link>
-            );
-          })}
-        </div>
-      )}
-
-      {/* Summary Cards */}
-      {!loading && (
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-6">
-          <div className="p-4 rounded-xl bg-[var(--glass)] border border-[var(--glass-border)]">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-[var(--success)]/10 flex items-center justify-center">
-                <CheckCircle className="w-5 h-5 text-[var(--success)]" />
-              </div>
-              <div>
-                <p className="text-sm text-[var(--text-dim)]">Inquilinos Activos</p>
-                <p className="text-xl font-bold text-[var(--text-primary)]">
-                  {tenants.filter((t: any) => t.status === 'active').length}
-                </p>
-              </div>
-            </div>
-          </div>
-          <div className="p-4 rounded-xl bg-[var(--glass)] border border-[var(--glass-border)]">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-[var(--nexus-gold)]/10 flex items-center justify-center">
-                <Clock className="w-5 h-5 text-[var(--nexus-gold)]" />
-              </div>
-              <div>
-                <p className="text-sm text-[var(--text-dim)]">Pendientes</p>
-                <p className="text-xl font-bold text-[var(--text-primary)]">
-                  {tenants.filter((t: any) => t.status === 'pending').length}
-                </p>
-              </div>
-            </div>
-          </div>
-          <div className="p-4 rounded-xl bg-[var(--glass)] border border-[var(--glass-border)]">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-[var(--error)]/10 flex items-center justify-center">
-                <XCircle className="w-5 h-5 text-[var(--error)]" />
-              </div>
-              <div>
-                <p className="text-sm text-[var(--text-dim)]">Suspendidos</p>
-                <p className="text-xl font-bold text-[var(--text-primary)]">
-                  {tenants.filter((t: any) => t.status === 'suspended').length}
-                </p>
-              </div>
-            </div>
-          </div>
-          <div className="p-4 rounded-xl bg-[var(--glass)] border border-[var(--glass-border)]">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-[var(--nexus-violet)]/10 flex items-center justify-center">
-                <UserCheck className="w-5 h-5 text-[var(--nexus-violet)]" />
-              </div>
-              <div>
-                <p className="text-sm text-[var(--text-dim)]">Total Usuarios</p>
-                <p className="text-xl font-bold text-[var(--text-primary)]">
-                  {tenants.reduce((sum: number, t: any) => sum + (t._count?.users || 0), 0)}
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
-// ============================================
-// DASHBOARD OVERVIEW
-// ============================================
-function DashboardOverview() {
-  return (
-    <div className="space-y-6">
-      {/* Welcome */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-bold text-[var(--text-primary)]">Bienvenido a la Torre de Control</h2>
-          <p className="text-[var(--text-mid)]">Panel centralizado de administración de NexusOS</p>
-        </div>
-        <div className="text-right">
-          <p className="text-sm text-[var(--text-dim)]">Hoy</p>
-          <p className="text-lg font-semibold text-[var(--text-primary)]">
-            {new Date().toLocaleDateString('es-TT', { weekday: 'long', day: 'numeric', month: 'long' })}
-          </p>
-        </div>
-      </div>
-
-      {/* Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard
-          title="Ingresos del Mes"
-          value="TT$45,500"
-          change="+12.5% vs mes anterior"
-          trend="up"
-          icon={DollarSign}
-          color="#F0B429"
-        />
-        <StatCard
-          title="Inquilinos Activos"
-          value="23"
-          change="+3 nuevos"
-          trend="up"
-          icon={Building2}
-          color="#22D3EE"
-        />
-        <StatCard
-          title="Usuarios Totales"
-          value="156"
-          change="+18 esta semana"
-          trend="up"
-          icon={Users}
-          color="#34D399"
-        />
-        <StatCard
-          title="Tasa de Actividad"
-          value="94%"
-          change="-2% vs semana anterior"
-          trend="down"
-          icon={Activity}
-          color="#EC4899"
-        />
-      </div>
-
-      {/* Quick Actions */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {[
-          { title: 'Crear Inquilino', icon: Plus, color: '#F0B429', tab: 'create-tenant' },
-          { title: 'Ver Órdenes', icon: CreditCard, color: '#22D3EE', tab: 'orders' },
-          { title: 'Gestionar Planes', icon: DollarSign, color: '#34D399', tab: 'pricing' },
-          { title: 'Configuración', icon: Settings, color: '#EC4899', tab: 'settings' },
-        ].map((action, index) => (
-          <button
-            key={index}
-            onClick={() => {
-              if (action.tab === 'create-tenant') {
-                const event = new CustomEvent('adminTabChange', { detail: action.tab });
-                window.dispatchEvent(event);
-              } else {
-                const event = new CustomEvent('adminTabChange', { detail: action.tab });
-                window.dispatchEvent(event);
-              }
-            }}
-            className="flex items-center gap-3 p-4 rounded-xl bg-[var(--glass)] border border-[var(--glass-border)] hover:border-[rgba(167,139,250,0.3)] transition-all group"
-          >
-            <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: `${action.color}20` }}>
-              <action.icon className="w-5 h-5" style={{ color: action.color }} />
-            </div>
-            <span className="text-[var(--text-primary)] font-medium group-hover:text-[var(--nexus-gold)] transition-colors">
-              {action.title}
-            </span>
-            <ChevronRight className="w-4 h-4 ml-auto text-[var(--text-dim)] group-hover:text-[var(--nexus-gold)]" />
-          </button>
-        ))}
-      </div>
-
-      {/* Industry Access */}
-      <div className="glass-card p-6">
-        <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-4">Acceso Rápido a Industrias</h3>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {[
-            { name: 'Clínicas', icon: Stethoscope, href: '/clinic', color: '#22D3EE', count: 12 },
-            { name: 'Enfermería', icon: Heart, href: '/nurse', color: '#34D399', count: 5 },
-            { name: 'Bufetes', icon: Scale, href: '/lawfirm', color: '#C4A35A', count: 4 },
-            { name: 'Belleza', icon: Scissors, href: '/beauty', color: '#EC4899', count: 2 },
-          ].map((industry, index) => (
-            <Link
-              key={index}
-              href={industry.href}
-              className="flex flex-col items-center p-4 rounded-xl bg-[var(--glass)] hover:bg-[rgba(108,63,206,0.1)] transition-all group"
-            >
-              <div className="w-14 h-14 rounded-xl flex items-center justify-center mb-3 group-hover:scale-110 transition-transform" style={{ backgroundColor: `${industry.color}20` }}>
-                <industry.icon className="w-7 h-7" style={{ color: industry.color }} />
-              </div>
-              <span className="text-[var(--text-primary)] font-medium">{industry.name}</span>
-              <span className="text-xs text-[var(--text-dim)]">{industry.count} espacios</span>
-            </Link>
-          ))}
-        </div>
-      </div>
-
-      {/* Capacity Metrics */}
-      <CapacityMetrics />
-    </div>
-  );
-}
-
-// ============================================
-// USERS MANAGEMENT (Placeholder)
-// ============================================
-function UsersManagement() {
-  return (
-    <div className="space-y-6">
-      <div>
-        <h2 className="text-xl font-bold text-[var(--text-primary)]">Gestión de Usuarios</h2>
-        <p className="text-sm text-[var(--text-mid)]">Administra usuarios del sistema</p>
-      </div>
-      <div className="glass-card p-6 text-center">
-        <Users className="w-12 h-12 text-[var(--text-dim)] mx-auto mb-4" />
-        <p className="text-[var(--text-mid)]">Módulo de usuarios en desarrollo...</p>
-      </div>
-    </div>
-  );
-}
+export default AdminDashboard;

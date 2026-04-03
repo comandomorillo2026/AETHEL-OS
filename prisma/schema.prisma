@@ -1,0 +1,3025 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_DATABASE_URL")
+}
+
+model Account {
+  id          String   @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  SystemUser        SystemUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+}
+
+model ActivityLog {
+  id          String   @id @default(cuid())
+  tenantId    String?
+  userId      String?
+  userEmail   String?
+  userName    String?
+  action      String
+  entityType  String
+  entityId    String?
+  description String
+  oldValue    String?
+  newValue    String?
+  ipAddress   String?
+  userAgent   String?
+  createdAt   DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([entityType])
+  @@index([userId])
+  @@index([tenantId])
+}
+
+model AdminUser {
+  id          String   @id @default(cuid())
+  email       String   @unique
+  name        String?
+  role        String   @default("ADMIN")
+  isActive    Boolean  @default(true)
+  lastLoginAt String?
+  createdAt   DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([role])
+  @@index([email])
+}
+
+model Appointment {
+  id          String   @id @default(cuid())
+  tenantId           String
+  patientId          String
+  patientName        String
+  appointmentNumber  String
+  title              String
+  description        String?
+  date               String
+  startTime          String
+  endTime            String?
+  duration           Int      @default(30)
+  status             String   @default("scheduled")
+  type               String   @default("consultation")
+  providerId         String?
+  providerName       String?
+  price              Float?
+  paid               Boolean  @default(false)
+  reminderSmsSent    Boolean  @default(false)
+  reminderEmailSent  Boolean  @default(false)
+  notes              String?
+  cancellationReason String?
+  createdAt          DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  Patient            Patient  @relation(fields: [patientId], references: [id])
+
+  @@index([status])
+  @@index([date])
+  @@index([tenantId])
+}
+
+model BeautyAccountingEntry {
+  id          String   @id @default(cuid())
+  tenantId      String
+  branchId      String?
+  entryNumber   String
+  entryDate     String
+  entryType     String
+  accountCode   String
+  accountName   String
+  accountType   String
+  description   String
+  amount        Float
+  referenceType String?
+  referenceId   String?
+  periodMonth   Int
+  periodYear    Int
+  status        String   @default("pending")
+  postedAt      String?
+  postedBy      String?
+  reconciledAt  String?
+  reconciledBy  String?
+  notes         String?
+  createdAt     DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([periodYear])
+  @@index([periodMonth])
+  @@index([entryDate])
+  @@index([accountCode])
+  @@index([tenantId])
+}
+
+model BeautyAppointment {
+  id          String   @id @default(cuid())
+  tenantId             String
+  branchId             String?
+  appointmentNumber    String
+  clientId             String?
+  clientName           String
+  clientPhone          String?
+  clientEmail          String?
+  staffId              String?
+  staffName            String?
+  date                 String
+  startTime            String
+  endTime              String?
+  durationMinutes      Int           @default(30)
+  services             String
+  status               String        @default("scheduled")
+  confirmedAt          String?
+  completedAt          String?
+  cancelledAt          String?
+  cancellationReason   String?
+  subtotal             Float         @default(0)
+  discount             Float         @default(0)
+  tax                  Float         @default(0)
+  total                Float         @default(0)
+  paid                 Boolean       @default(false)
+  paymentMethod        String?
+  paymentReference     String?
+  paidAt               String?
+  depositRequired      Boolean       @default(false)
+  depositAmount        Float?
+  depositPaid          Boolean       @default(false)
+  depositPaidAt        String?
+  notes                String?
+  internalNotes        String?
+  reminderSmsSent      Boolean       @default(false)
+  reminderEmailSent    Boolean       @default(false)
+  reminderWhatsappSent Boolean       @default(false)
+  isWalkIn             Boolean       @default(false)
+  source               String        @default("desk")
+  createdAt            DateTime      @default(now())
+  updatedAt      DateTime @updatedAt
+  BeautyBranch         BeautyBranch? @relation(fields: [branchId], references: [id])
+  BeautyStaff          BeautyStaff?  @relation(fields: [staffId], references: [id])
+  BeautyClient         BeautyClient? @relation(fields: [clientId], references: [id])
+
+  @@index([staffId])
+  @@index([clientId])
+  @@index([status])
+  @@index([date])
+  @@index([branchId])
+  @@index([tenantId])
+}
+
+model BeautyBranch {
+  id          String   @id @default(cuid())
+  tenantId           String
+  name               String
+  code               String?
+  address            String?
+  city               String?
+  country            String               @default("Trinidad & Tobago")
+  phone              String?
+  email              String?
+  whatsapp           String?
+  managerName        String?
+  managerPhone       String?
+  openingTime        String               @default("09:00")
+  closingTime        String               @default("18:00")
+  workingDays        String?
+  status             String               @default("active")
+  primaryColor       String               @default("#EC4899")
+  secondaryColor     String               @default("#8B5CF6")
+  isActive           Boolean              @default(true)
+  createdAt          DateTime             @default(now())
+  updatedAt      DateTime @updatedAt
+  BeautyAppointment  BeautyAppointment[]
+  BeautyCashRegister BeautyCashRegister[]
+  BeautyExpense      BeautyExpense[]
+  BeautySale         BeautySale[]
+  BeautyStaff        BeautyStaff[]
+
+  @@index([status])
+  @@index([tenantId])
+}
+
+model BeautyCashRegister {
+  id          String   @id @default(cuid())
+  tenantId         String
+  branchId         String?
+  name             String
+  location         String?
+  openedAt         String
+  openedBy         String?
+  openingBalance   Float
+  cashSales        Float         @default(0)
+  cardSales        Float         @default(0)
+  transferSales    Float         @default(0)
+  otherSales       Float         @default(0)
+  cashIn           Float         @default(0)
+  cashOut          Float         @default(0)
+  closedAt         String?
+  closedBy         String?
+  closingBalance   Float?
+  expectedBalance  Float?
+  difference       Float?
+  differenceReason String?
+  status           String        @default("open")
+  notes            String?
+  createdAt        DateTime      @default(now())
+  updatedAt      DateTime @updatedAt
+  BeautyBranch     BeautyBranch? @relation(fields: [branchId], references: [id])
+
+  @@index([status])
+  @@index([branchId])
+  @@index([tenantId])
+}
+
+model BeautyChartOfAccounts {
+  id          String   @id @default(cuid())
+  tenantId          String
+  accountCode       String   @unique
+  accountName       String
+  accountType       String
+  parentCode        String?
+  description       String?
+  normalBalance     String   @default("debit")
+  isBankAccount     Boolean  @default(false)
+  bankName          String?
+  bankAccountNumber String?
+  isActive          Boolean  @default(true)
+  createdAt         DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([accountType])
+  @@index([accountCode])
+  @@index([tenantId])
+}
+
+model BeautyClient {
+  id          String   @id @default(cuid())
+  tenantId               String
+  clientNumber           String                   @unique
+  firstName              String
+  lastName               String
+  fullName               String
+  email                  String?
+  phone                  String
+  phoneAlt               String?
+  gender                 String?
+  dateOfBirth            String?
+  address                String?
+  city                   String?
+  country                String                   @default("Trinidad & Tobago")
+  preferredStaffId       String?
+  preferredServices      String?
+  notes                  String?
+  allergies              String?
+  membershipId           String?
+  membershipStatus       String                   @default("regular")
+  loyaltyPoints          Int                      @default(0)
+  totalVisits            Int                      @default(0)
+  totalSpent             Float                    @default(0)
+  marketingOptIn         Boolean                  @default(false)
+  contactPreference      String?
+  photos                 String?
+  avatarUrl              String?
+  isActive               Boolean                  @default(true)
+  createdAt              DateTime                 @default(now())
+  updatedAt      DateTime @updatedAt
+  BeautyAppointment      BeautyAppointment[]
+  BeautyClientMembership BeautyClientMembership[]
+  BeautySale             BeautySale[]
+
+  @@index([membershipStatus])
+  @@index([phone])
+  @@index([clientNumber])
+  @@index([tenantId])
+}
+
+model BeautyClientMembership {
+  id          String   @id @default(cuid())
+  tenantId           String
+  clientId           String
+  membershipId       String
+  startDate          String
+  endDate            String?
+  status             String           @default("active")
+  billingCycle       String           @default("monthly")
+  autoRenew          Boolean          @default(true)
+  lastPaymentDate    String?
+  nextPaymentDate    String?
+  servicesUsed       Int              @default(0)
+  servicesRemaining  Int?
+  cancelledAt        String?
+  cancellationReason String?
+  createdAt          DateTime         @default(now())
+  updatedAt      DateTime @updatedAt
+  BeautyMembership   BeautyMembership @relation(fields: [membershipId], references: [id])
+  BeautyClient       BeautyClient     @relation(fields: [clientId], references: [id])
+
+  @@index([status])
+  @@index([membershipId])
+  @@index([clientId])
+  @@index([tenantId])
+}
+
+model BeautyCommission {
+  id          String   @id @default(cuid())
+  tenantId         String
+  branchId         String?
+  staffId          String
+  staffName        String?
+  saleId           String?
+  saleNumber       String?
+  commissionType   String
+  baseAmount       Float
+  commissionRate   Float
+  commissionAmount Float
+  status           String      @default("pending")
+  periodStart      String?
+  periodEnd        String?
+  paidAt           String?
+  paymentReference String?
+  notes            String?
+  createdAt        DateTime    @default(now())
+  updatedAt      DateTime @updatedAt
+  BeautySale       BeautySale? @relation(fields: [saleId], references: [id])
+  BeautyStaff      BeautyStaff @relation(fields: [staffId], references: [id])
+
+  @@index([periodStart])
+  @@index([status])
+  @@index([staffId])
+  @@index([tenantId])
+}
+
+model BeautyExpense {
+  id          String   @id @default(cuid())
+  tenantId         String
+  branchId         String?
+  expenseNumber    String
+  category         String
+  subcategory      String?
+  description      String
+  amount           Float
+  currency         String        @default("TTD")
+  frequency        String        @default("one_time")
+  isRecurring      Boolean       @default(false)
+  recurrenceDay    Int?
+  vendorName       String?
+  vendorId         String?
+  paymentMethod    String?
+  paymentReference String?
+  paidAt           String?
+  status           String        @default("pending")
+  expenseDate      String
+  dueDate          String?
+  receiptUrl       String?
+  invoiceUrl       String?
+  accountId        String?
+  accountName      String?
+  taxDeductible    Boolean       @default(true)
+  notes            String?
+  approvedBy       String?
+  approvedAt       String?
+  createdAt        DateTime      @default(now())
+  updatedAt      DateTime @updatedAt
+  BeautyBranch     BeautyBranch? @relation(fields: [branchId], references: [id])
+
+  @@index([status])
+  @@index([expenseDate])
+  @@index([category])
+  @@index([branchId])
+  @@index([tenantId])
+}
+
+model BeautyFinancialReport {
+  id          String   @id @default(cuid())
+  tenantId         String
+  reportType       String
+  reportPeriod     String
+  periodStart      String
+  periodEnd        String
+  reportData       String
+  totalRevenue     Float?
+  totalExpenses    Float?
+  netIncome        Float?
+  status           String   @default("generated")
+  generatedAt      String
+  generatedBy      String?
+  reviewedAt       String?
+  reviewedBy       String?
+  approvedAt       String?
+  approvedBy       String?
+  accountantNotes  String?
+  accountantSigned Boolean  @default(false)
+  signedAt         String?
+  signedBy         String?
+  pdfUrl           String?
+  excelUrl         String?
+  createdAt        DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([periodStart])
+  @@index([reportType])
+  @@index([tenantId])
+}
+
+model BeautyMembership {
+  id          String   @id @default(cuid())
+  tenantId               String
+  name                   String
+  description            String?
+  tier                   String
+  color                  String                   @default("#8B5CF6")
+  monthlyPrice           Float
+  annualPrice            Float?
+  priceCurrency          String                   @default("TTD")
+  discountPercent        Float                    @default(0)
+  pointsMultiplier       Float                    @default(1)
+  freeServices           String?
+  benefits               String?
+  maxMembers             Int?
+  isActive               Boolean                  @default(true)
+  createdAt              DateTime                 @default(now())
+  updatedAt      DateTime @updatedAt
+  BeautyClientMembership BeautyClientMembership[]
+
+  @@index([tier])
+  @@index([tenantId])
+}
+
+model BeautyProduct {
+  id          String   @id @default(cuid())
+  tenantId                 String
+  name                     String
+  description              String?
+  sku                      String?
+  barcode                  String?
+  category                 String
+  brand                    String?
+  costPrice                Float
+  sellingPrice             Float
+  priceCurrency            String                     @default("TTD")
+  quantityInStock          Int                        @default(0)
+  quantityReserved         Int                        @default(0)
+  reorderLevel             Int?
+  reorderQuantity          Int?
+  size                     String?
+  weight                   Float?
+  location                 String?
+  supplierId               String?
+  supplierName             String?
+  expiryDate               String?
+  lotNumber                String?
+  commissionPercent        Float                      @default(0)
+  stockByBranch            String?
+  isActive                 Boolean                    @default(true)
+  createdAt                DateTime                   @default(now())
+  updatedAt      DateTime @updatedAt
+  BeautyProductTransaction BeautyProductTransaction[]
+  BeautySaleItem           BeautySaleItem[]
+
+  @@index([barcode])
+  @@index([sku])
+  @@index([category])
+  @@index([tenantId])
+}
+
+model BeautyProductTransaction {
+  id          String   @id @default(cuid())
+  tenantId      String
+  branchId      String?
+  productId     String
+  type          String
+  quantity      Int
+  quantityAfter Int
+  unitCost      Float?
+  totalCost     Float?
+  reason        String?
+  reference     String?
+  performedBy   String?
+  createdAt     DateTime      @default(now())
+  BeautyProduct BeautyProduct @relation(fields: [productId], references: [id])
+
+  @@index([type])
+  @@index([productId])
+  @@index([tenantId])
+}
+
+model BeautySale {
+  id          String   @id @default(cuid())
+  tenantId         String
+  branchId         String?
+  saleNumber       String             @unique
+  clientId         String?
+  clientName       String?
+  clientPhone      String?
+  staffId          String?
+  staffName        String?
+  saleType         String             @default("service")
+  items            String
+  subtotal         Float
+  discount         Float              @default(0)
+  discountType     String?
+  discountValue    Float?
+  discountReason   String?
+  tax              Float              @default(0)
+  tip              Float              @default(0)
+  total            Float
+  paymentMethod    String             @default("cash")
+  paymentDetails   String?
+  paymentReference String?
+  status           String             @default("completed")
+  invoiceNumber    String?
+  invoiceGenerated Boolean            @default(false)
+  notes            String?
+  cashRegisterId   String?
+  createdAt        DateTime           @default(now())
+  updatedAt      DateTime @updatedAt
+  BeautyCommission BeautyCommission[]
+  BeautyBranch     BeautyBranch?      @relation(fields: [branchId], references: [id])
+  BeautyStaff      BeautyStaff?       @relation(fields: [staffId], references: [id])
+  BeautyClient     BeautyClient?      @relation(fields: [clientId], references: [id])
+
+  @@index([createdAt])
+  @@index([saleNumber])
+  @@index([branchId])
+  @@index([tenantId])
+}
+
+model BeautySaleItem {
+  id          String   @id @default(cuid())
+  tenantId         String
+  saleId           String?
+  itemType         String
+  itemId           String?
+  itemName         String
+  quantity         Int            @default(1)
+  unitPrice        Float
+  discount         Float          @default(0)
+  total            Float
+  staffId          String?
+  staffName        String?
+  commissionAmount Float          @default(0)
+  productId        String?
+  productSku       String?
+  createdAt        DateTime       @default(now())
+  BeautyProduct    BeautyProduct? @relation(fields: [productId], references: [id])
+  BeautyService    BeautyService? @relation(fields: [itemId], references: [id])
+
+  @@index([itemType])
+  @@index([saleId])
+  @@index([tenantId])
+}
+
+model BeautyService {
+  id          String   @id @default(cuid())
+  tenantId            String
+  name                String
+  description         String?
+  code                String?
+  category            String
+  subcategory         String?
+  price               Float
+  priceCurrency       String           @default("TTD")
+  priceVariable       Boolean          @default(false)
+  durationMinutes     Int              @default(30)
+  bufferMinutes       Int              @default(0)
+  commissionType      String           @default("percentage")
+  commissionValue     Float?
+  requiresDeposit     Boolean          @default(false)
+  depositAmount       Float?
+  depositPercentage   Float?
+  genderTarget        String           @default("all")
+  resourcesNeeded     String?
+  availableAtBranches String?
+  isActive            Boolean          @default(true)
+  createdAt           DateTime         @default(now())
+  updatedAt      DateTime @updatedAt
+  BeautySaleItem      BeautySaleItem[]
+
+  @@index([isActive])
+  @@index([category])
+  @@index([tenantId])
+}
+
+model BeautySettings {
+  id          String   @id @default(cuid())
+  tenantId           String   @unique
+  salonName          String
+  legalName          String?
+  taxId              String?
+  email              String?
+  phone              String?
+  website            String?
+  whatsapp           String?
+  address            String?
+  city               String?
+  country            String   @default("Trinidad & Tobago")
+  logoUrl            String?
+  primaryColor       String   @default("#EC4899")
+  secondaryColor     String   @default("#8B5CF6")
+  accentColor        String   @default("#F59E0B")
+  salonType          String   @default("mixed")
+  currency           String   @default("TTD")
+  currencySymbol     String   @default("TT$")
+  taxEnabled         Boolean  @default(false)
+  taxRate            Float    @default(0)
+  taxName            String?
+  taxNumber          String?
+  defaultOpeningTime String   @default("09:00")
+  defaultClosingTime String   @default("18:00")
+  defaultWorkingDays String   @default("monday,tuesday,wednesday,thursday,friday,saturday")
+  bookingInterval    Int      @default(15)
+  minBookingNotice   Int      @default(60)
+  maxBookingAdvance  Int      @default(30)
+  cancellationHours  Int      @default(24)
+  depositEnabled     Boolean  @default(false)
+  depositPercentage  Float    @default(20)
+  depositRequiredFor String?
+  reminderEnabled    Boolean  @default(true)
+  reminderHours      Int      @default(24)
+  reminderChannels   String?
+  loyaltyEnabled     Boolean  @default(false)
+  pointsPerDollar    Float    @default(1)
+  pointsRedeemRate   Float    @default(100)
+  commissionEnabled  Boolean  @default(true)
+  paymentMethods     String?
+  wiPayEnabled       Boolean  @default(false)
+  wiPayApiKey        String?
+  stripeEnabled      Boolean  @default(false)
+  stripePublicKey    String?
+  accountantEmail    String?
+  autoSendReports    Boolean  @default(false)
+  reportFrequency    String   @default("monthly")
+  createdAt          DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([tenantId])
+}
+
+model BeautyStaff {
+  id          String   @id @default(cuid())
+  tenantId            String
+  branchId            String?
+  userId              String?
+  firstName           String
+  lastName            String
+  fullName            String
+  email               String?
+  phone               String?
+  role                String                @default("STYLIST")
+  specializations     String?
+  level               String                @default("JUNIOR")
+  workingHours        String?
+  workingDays         String?
+  commissionType      String                @default("percentage")
+  commissionValue     Float                 @default(0)
+  productCommission   Float                 @default(0)
+  totalClients        Int                   @default(0)
+  totalSales          Float                 @default(0)
+  totalCommission     Float                 @default(0)
+  rating              Float                 @default(5.0)
+  totalReviews        Int                   @default(0)
+  isActive            Boolean               @default(true)
+  hireDate            String?
+  terminationDate     String?
+  avatarUrl           String?
+  createdAt           DateTime              @default(now())
+  updatedAt      DateTime @updatedAt
+  BeautyAppointment   BeautyAppointment[]
+  BeautyCommission    BeautyCommission[]
+  BeautySale          BeautySale[]
+  BeautyBranch        BeautyBranch?         @relation(fields: [branchId], references: [id])
+  BeautyStaffSchedule BeautyStaffSchedule[]
+
+  @@index([isActive])
+  @@index([role])
+  @@index([branchId])
+  @@index([tenantId])
+}
+
+model BeautyStaffSchedule {
+  id          String   @id @default(cuid())
+  tenantId    String
+  staffId     String
+  branchId    String?
+  date        String
+  startTime   String
+  endTime     String
+  isWorking   Boolean     @default(true)
+  isBreak     Boolean     @default(false)
+  notes       String?
+  createdAt   DateTime    @default(now())
+  updatedAt      DateTime @updatedAt
+  BeautyStaff BeautyStaff @relation(fields: [staffId], references: [id])
+
+  @@index([date])
+  @@index([staffId])
+  @@index([tenantId])
+}
+
+model BeautyTaxPayment {
+  id          String   @id @default(cuid())
+  tenantId          String
+  branchId          String?
+  taxNumber         String
+  taxType           String
+  periodStart       String
+  periodEnd         String
+  grossRevenue      Float
+  taxableAmount     Float
+  taxRate           Float
+  taxAmount         Float
+  paymentDate       String?
+  paymentMethod     String?
+  paymentReference  String?
+  filedAt           String?
+  filedBy           String?
+  filingReference   String?
+  status            String   @default("pending")
+  notes             String?
+  receiptUrl        String?
+  filingDocumentUrl String?
+  createdAt         DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([status])
+  @@index([periodStart])
+  @@index([taxType])
+  @@index([tenantId])
+}
+
+model ClinicConfig {
+  id          String   @id @default(cuid())
+  tenantId         String   @unique
+  clinicName       String
+  legalName        String?
+  taxId            String?
+  email            String?
+  phone            String?
+  website          String?
+  address          String?
+  city             String?
+  country          String   @default("Trinidad & Tobago")
+  logoUrl          String?
+  primaryColor     String   @default("#6C3FCE")
+  secondaryColor   String   @default("#F0B429")
+  accentColor      String   @default("#C026D3")
+  invoicePrefix    String   @default("INV")
+  invoiceNotes     String?
+  paymentMethods   String?
+  bankDetails      String?
+  businessHours    String?
+  reminderSettings String?
+  currency         String   @default("TTD")
+  currencySymbol   String   @default("TT$")
+  taxRate          Float    @default(0)
+  whatsappNumber   String?
+  whatsappEnabled  Boolean  @default(false)
+  createdAt        DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([tenantId])
+}
+
+model ClinicService {
+  id          String   @id @default(cuid())
+  tenantId      String
+  name          String
+  description   String?
+  category      String?
+  price         Float
+  priceCurrency String   @default("TTD")
+  duration      Int      @default(30)
+  code          String?
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([tenantId])
+}
+
+model Industry {
+  id          String   @id @default(cuid())
+  slug           String   @unique
+  nameEn         String
+  nameEs         String
+  icon           String
+  descriptionEn  String
+  descriptionEs  String
+  status         String   @default("active")
+  sortOrder      Int      @default(0)
+  modulesStarter String?
+  modulesGrowth  String?
+  modulesPremium String?
+  isDeleted      Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([status])
+  @@index([slug])
+}
+
+model InventoryItem {
+  id          String   @id @default(cuid())
+  tenantId             String
+  sku                  String?
+  name                 String
+  description          String?
+  category             String?
+  unitOfMeasure        String?
+  quantityInStock      Int                    @default(0)
+  quantityReserved     Int                    @default(0)
+  reorderLevel         Int?
+  reorderQuantity      Int?
+  costPrice            Float?
+  sellingPrice         Float?
+  location             String?
+  supplier             String?
+  expiryDate           String?
+  lotNumber            String?
+  isActive             Boolean                @default(true)
+  createdAt            DateTime               @default(now())
+  updatedAt      DateTime @updatedAt
+  InventoryTransaction InventoryTransaction[]
+
+  @@index([category])
+  @@index([tenantId])
+}
+
+model InventoryTransaction {
+  id          String   @id @default(cuid())
+  tenantId      String
+  itemId        String
+  type          String
+  quantity      Int
+  reason        String?
+  reference     String?
+  performedBy   String?
+  createdAt     DateTime      @default(now())
+  InventoryItem InventoryItem @relation(fields: [itemId], references: [id])
+
+  @@index([itemId])
+  @@index([tenantId])
+}
+
+model Invoice {
+  id          String   @id @default(cuid())
+  tenantId         String
+  patientId        String?
+  invoiceNumber    String
+  patientName      String
+  patientEmail     String?
+  patientPhone     String?
+  patientAddress   String?
+  items            String
+  subtotal         Float
+  tax              Float    @default(0)
+  discount         Float    @default(0)
+  total            Float
+  status           String   @default("draft")
+  issueDate        String
+  dueDate          String?
+  paidAt           String?
+  paymentMethod    String?
+  paymentReference String?
+  notes            String?
+  appointmentId    String?
+  createdAt        DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  Patient          Patient? @relation(fields: [patientId], references: [id])
+
+  @@index([status])
+  @@index([invoiceNumber])
+  @@index([tenantId])
+}
+
+model LabOrder {
+  id          String   @id @default(cuid())
+  tenantId           String
+  orderId            String   @unique
+  patientId          String
+  patientName        String
+  providerId         String?
+  providerName       String?
+  tests              String
+  status             String   @default("ordered")
+  orderedAt          String
+  collectedAt        String?
+  processedAt        String?
+  readyAt            String?
+  priority           String   @default("routine")
+  notes              String?
+  clinicalIndication String?
+  results            String?
+  createdAt          DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([status])
+  @@index([patientId])
+  @@index([tenantId])
+}
+
+model LabTest {
+  id          String   @id @default(cuid())
+  tenantId                String
+  name                    String
+  code                    String?
+  category                String?
+  description             String?
+  preparationInstructions String?
+  price                   Float?
+  priceCurrency           String   @default("TTD")
+  turnaroundHours         Int?
+  isActive                Boolean  @default(true)
+  createdAt               DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([category])
+  @@index([tenantId])
+}
+
+model LawAttorney {
+  id          String   @id @default(cuid())
+  tenantId      String
+  userId        String?
+  firstName     String
+  lastName      String
+  fullName      String
+  email         String?
+  phone         String?
+  barNumber     String?
+  practiceAreas String?
+  title         String?
+  hourlyRate    Float?
+  billingType   String         @default("hourly")
+  status        String         @default("active")
+  hireDate      String?
+  avatarUrl     String?
+  createdAt     DateTime       @default(now())
+  updatedAt      DateTime @updatedAt
+  LawTimeEntry  LawTimeEntry[]
+
+  @@index([status])
+  @@index([barNumber])
+  @@index([tenantId])
+}
+
+model LawCalendarEvent {
+  id          String   @id @default(cuid())
+  tenantId         String
+  caseId           String?
+  title            String
+  description      String?
+  eventType        String   @default("meeting")
+  date             String
+  startTime        String
+  endTime          String?
+  allDay           Boolean  @default(false)
+  location         String?
+  courtroom        String?
+  judge            String?
+  attendees        String?
+  reminderMinutes  Int?
+  reminderSent     Boolean  @default(false)
+  status           String   @default("scheduled")
+  isRecurring      Boolean  @default(false)
+  recurringPattern String?
+  notes            String?
+  createdAt        DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  LawCase          LawCase? @relation(fields: [caseId], references: [id])
+
+  @@index([status])
+  @@index([eventType])
+  @@index([date])
+  @@index([caseId])
+  @@index([tenantId])
+}
+
+model LawCase {
+  id          String   @id @default(cuid())
+  tenantId             String
+  caseNumber           String                @unique
+  fileNumber           String?
+  title                String
+  description          String?
+  practiceArea         String
+  caseType             String?
+  jurisdiction         String?
+  court                String?
+  judge                String?
+  clientId             String
+  clientName           String
+  opposingParty        String?
+  opposingCounsel      String?
+  leadAttorneyId       String?
+  leadAttorneyName     String?
+  teamMembers          String?
+  openDate             String
+  closeDate            String?
+  statuteOfLimitations String?
+  nextDeadline         String?
+  nextDeadlineDesc     String?
+  status               String                @default("open")
+  stage                String?
+  priority             String                @default("normal")
+  billingType          String                @default("hourly")
+  hourlyRate           Float?
+  flatFee              Float?
+  contingencyPercent   Float?
+  retainerAmount       Float?
+  retainerUsed         Float                 @default(0)
+  trustBalance         Float                 @default(0)
+  progress             Int                   @default(0)
+  notes                String?
+  internalNotes        String?
+  tags                 String?
+  isDeleted            Boolean               @default(false)
+  createdAt            DateTime              @default(now())
+  updatedAt      DateTime @updatedAt
+  LawCalendarEvent     LawCalendarEvent[]
+  LawClient            LawClient             @relation(fields: [clientId], references: [id])
+  LawDocument          LawDocument[]
+  LawInvoice           LawInvoice[]
+  LawTask              LawTask[]
+  LawTimeEntry         LawTimeEntry[]
+  LawTrustTransaction  LawTrustTransaction[]
+
+  @@index([openDate])
+  @@index([practiceArea])
+  @@index([clientId])
+  @@index([status])
+  @@index([caseNumber])
+  @@index([tenantId])
+}
+
+model LawClient {
+  id          String   @id @default(cuid())
+  tenantId          String
+  clientType        String           @default("individual")
+  firstName         String?
+  lastName          String?
+  fullName          String
+  companyName       String?
+  idType            String?
+  idNumber          String?
+  email             String?
+  phone             String
+  phoneAlt          String?
+  address           String?
+  city              String?
+  country           String           @default("Trinidad & Tobago")
+  occupation        String?
+  employer          String?
+  emergencyContact  String?
+  emergencyPhone    String?
+  status            String           @default("active")
+  source            String?
+  billingRate       Float?
+  billingType       String           @default("hourly")
+  paymentTerms      String?
+  creditLimit       Float?
+  conflictChecked   Boolean          @default(false)
+  conflictCheckedAt String?
+  conflictNotes     String?
+  notes             String?
+  tags              String?
+  importedFrom      String?
+  importBatchId     String?
+  isDeleted         Boolean          @default(false)
+  createdAt         DateTime         @default(now())
+  updatedAt      DateTime @updatedAt
+  LawCase           LawCase[]
+  LawTrustAccount   LawTrustAccount?
+
+  @@index([status])
+  @@index([phone])
+  @@index([email])
+  @@index([fullName])
+  @@index([tenantId])
+}
+
+model LawDocument {
+  id          String   @id @default(cuid())
+  tenantId          String
+  caseId            String?
+  name              String
+  description       String?
+  category          String?
+  fileUrl           String
+  fileSize          Int?
+  mimeType          String?
+  isTemplate        Boolean  @default(false)
+  templateId        String?
+  version           Int      @default(1)
+  previousVersionId String?
+  status            String   @default("draft")
+  documentDate      String?
+  filedDate         String?
+  servedDate        String?
+  tags              String?
+  contentText       String?
+  createdBy         String?
+  isDeleted         Boolean  @default(false)
+  createdAt         DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  LawCase           LawCase? @relation(fields: [caseId], references: [id])
+
+  @@index([isTemplate])
+  @@index([category])
+  @@index([caseId])
+  @@index([tenantId])
+}
+
+model LawDocumentTemplate {
+  id          String   @id @default(cuid())
+  tenantId     String
+  name         String
+  description  String?
+  category     String?
+  practiceArea String?
+  content      String
+  variables    String?
+  jurisdiction String?
+  isSystem     Boolean  @default(false)
+  isActive     Boolean  @default(true)
+  usageCount   Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([practiceArea])
+  @@index([category])
+  @@index([tenantId])
+}
+
+model LawInvoice {
+  id          String   @id @default(cuid())
+  tenantId         String
+  caseId           String?
+  clientId         String?
+  invoiceNumber    String   @unique
+  issueDate        String
+  dueDate          String?
+  paidDate         String?
+  items            String
+  subtotal         Float
+  discount         Float    @default(0)
+  tax              Float    @default(0)
+  total            Float
+  amountPaid       Float    @default(0)
+  balanceDue       Float
+  status           String   @default("draft")
+  paymentMethod    String?
+  paymentReference String?
+  paidFromTrust    Boolean  @default(false)
+  notes            String?
+  createdAt        DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  LawCase          LawCase? @relation(fields: [caseId], references: [id])
+
+  @@index([issueDate])
+  @@index([status])
+  @@index([clientId])
+  @@index([invoiceNumber])
+  @@index([tenantId])
+}
+
+model LawLegalReference {
+  id          String   @id @default(cuid())
+  tenantId      String?
+  type          String
+  jurisdiction  String   @default("Trinidad & Tobago")
+  title         String
+  shortTitle    String?
+  citation      String?
+  description   String?
+  content       String?
+  court         String?
+  dateDecided   String?
+  judges        String?
+  parties       String?
+  keywords      String?
+  tags          String?
+  references    String?
+  isActive      Boolean  @default(true)
+  effectiveDate String?
+  repealedDate  String?
+  source        String?
+  isDeleted     Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([citation])
+  @@index([title])
+  @@index([jurisdiction])
+  @@index([type])
+}
+
+model LawSettings {
+  id          String   @id @default(cuid())
+  tenantId            String   @unique
+  firmName            String
+  legalName           String?
+  email               String?
+  phone               String?
+  website             String?
+  address             String?
+  city                String?
+  country             String   @default("Trinidad & Tobago")
+  barNumber           String?
+  taxId               String?
+  logoUrl             String?
+  primaryColor        String   @default("#1E3A5F")
+  secondaryColor      String   @default("#C4A35A")
+  defaultHourlyRate   Float?
+  defaultBillableType String   @default("hourly")
+  defaultPaymentTerms String?
+  invoicePrefix       String   @default("INV")
+  invoiceNotes        String?
+  courtHolidays       String?
+  calendarSync        Boolean  @default(false)
+  emailNotifications  Boolean  @default(true)
+  createdAt           DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([tenantId])
+}
+
+model LawTask {
+  id          String   @id @default(cuid())
+  tenantId         String
+  caseId           String?
+  title            String
+  description      String?
+  assignedToId     String?
+  assignedToName   String?
+  priority         String   @default("normal")
+  status           String   @default("pending")
+  dueDate          String?
+  dueTime          String?
+  completedAt      String?
+  isRecurring      Boolean  @default(false)
+  recurringPattern String?
+  estimatedMinutes Int?
+  actualMinutes    Int?
+  notes            String?
+  createdAt        DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  LawCase          LawCase? @relation(fields: [caseId], references: [id])
+
+  @@index([assignedToId])
+  @@index([dueDate])
+  @@index([status])
+  @@index([caseId])
+  @@index([tenantId])
+}
+
+model LawTimeEntry {
+  id          String   @id @default(cuid())
+  tenantId        String
+  caseId          String
+  attorneyId      String
+  date            String
+  startTime       String
+  endTime         String?
+  durationMinutes Int         @default(0)
+  description     String
+  activityCode    String?
+  billableRate    Float?
+  billableAmount  Float?
+  isBillable      Boolean     @default(true)
+  isBilled        Boolean     @default(false)
+  invoiceId       String?
+  timerRunning    Boolean     @default(false)
+  timerStartedAt  String?
+  notes           String?
+  createdAt       DateTime    @default(now())
+  updatedAt      DateTime @updatedAt
+  LawAttorney     LawAttorney @relation(fields: [attorneyId], references: [id])
+  LawCase         LawCase     @relation(fields: [caseId], references: [id])
+
+  @@index([isBilled])
+  @@index([date])
+  @@index([attorneyId])
+  @@index([caseId])
+  @@index([tenantId])
+}
+
+model LawTrustAccount {
+  id          String   @id @default(cuid())
+  tenantId            String
+  clientId            String                @unique
+  accountName         String
+  accountNumber       String?
+  bankName            String?
+  balance             Float                 @default(0)
+  status              String                @default("active")
+  notes               String?
+  createdAt           DateTime              @default(now())
+  updatedAt      DateTime @updatedAt
+  LawClient           LawClient             @relation(fields: [clientId], references: [id])
+  LawTrustTransaction LawTrustTransaction[]
+
+  @@index([clientId])
+  @@index([tenantId])
+}
+
+model LawTrustTransaction {
+  id          String   @id @default(cuid())
+  tenantId          String
+  trustAccountId    String
+  caseId            String?
+  transactionNumber String
+  type              String
+  description       String
+  amount            Float
+  balanceAfter      Float
+  reference         String?
+  sourceType        String?
+  destinationType   String?
+  transactionDate   String
+  invoiceId         String?
+  approvedBy        String?
+  approvedAt        String?
+  notes             String?
+  createdAt         DateTime        @default(now())
+  updatedAt      DateTime @updatedAt
+  LawCase           LawCase?        @relation(fields: [caseId], references: [id])
+  LawTrustAccount   LawTrustAccount @relation(fields: [trustAccountId], references: [id])
+
+  @@index([type])
+  @@index([transactionDate])
+  @@index([caseId])
+  @@index([trustAccountId])
+  @@index([tenantId])
+}
+
+model Lead {
+  id          String   @id @default(cuid())
+  businessName      String
+  ownerName         String
+  email             String
+  phone             String
+  industry          String
+  country           String?
+  source            String   @default("sales_portal")
+  utmSource         String?
+  utmCampaign       String?
+  status            String   @default("new")
+  interestedPlan    String?
+  notes             String?
+  assignedTo        String?
+  convertedToTenant Boolean  @default(false)
+  tenantId          String?
+  salesOrderId      String?
+  createdAt         DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([status])
+  @@index([email])
+}
+
+model MedicalRecord {
+  id          String   @id @default(cuid())
+  tenantId         String
+  patientId        String
+  visitDate        String
+  appointmentId    String?
+  subjective       String?
+  objective        String?
+  assessment       String?
+  plan             String?
+  bloodPressure    String?
+  heartRate        Int?
+  temperature      Float?
+  weight           Float?
+  height           Float?
+  bmi              Float?
+  oxygenSaturation Int?
+  chiefComplaint   String?
+  diagnosis        String?
+  notes            String?
+  providerId       String?
+  providerName     String?
+  createdAt        DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  Patient          Patient  @relation(fields: [patientId], references: [id])
+
+  @@index([patientId])
+  @@index([tenantId])
+}
+
+model MedicationAdministration {
+  id          String   @id @default(cuid())
+  tenantId           String
+  patientId          String
+  patientName        String
+  prescriptionId     String?
+  nurseId            String
+  nurseName          String?
+  medicationName     String
+  dosage             String
+  route              String?
+  unit               String?
+  scheduledTime      String?
+  administeredAt     String
+  status             String        @default("administered")
+  reasonHeld         String?
+  reasonRefused      String?
+  administrationSite String?
+  notes              String?
+  verifiedBy         String?
+  verifiedAt         String?
+  createdAt          DateTime      @default(now())
+  Prescription       Prescription? @relation(fields: [prescriptionId], references: [id])
+  NurseStaff         NurseStaff    @relation(fields: [nurseId], references: [id])
+
+  @@index([status])
+  @@index([administeredAt])
+  @@index([patientId])
+  @@index([tenantId])
+}
+
+model NurseShift {
+  id          String   @id @default(cuid())
+  tenantId             String
+  name                 String
+  code                 String?
+  startTime            String
+  endTime              String
+  color                String                 @default("#6C3FCE")
+  isActive             Boolean                @default(true)
+  createdAt            DateTime               @default(now())
+  updatedAt      DateTime @updatedAt
+  NurseShiftAssignment NurseShiftAssignment[]
+
+  @@index([tenantId])
+}
+
+model NurseShiftAssignment {
+  id          String   @id @default(cuid())
+  tenantId         String
+  nurseId          String
+  shiftId          String
+  date             String
+  station          String?
+  patientsAssigned String?
+  status           String     @default("scheduled")
+  notes            String?
+  createdAt        DateTime   @default(now())
+  updatedAt      DateTime @updatedAt
+  NurseShift       NurseShift @relation(fields: [shiftId], references: [id])
+  NurseStaff       NurseStaff @relation(fields: [nurseId], references: [id])
+
+  @@index([nurseId])
+  @@index([date])
+  @@index([tenantId])
+}
+
+model NurseStaff {
+  id          String   @id @default(cuid())
+  tenantId                                                String
+  userId                                                  String?
+  employeeId                                              String?
+  firstName                                               String
+  lastName                                                String
+  fullName                                                String
+  email                                                   String?
+  phone                                                   String?
+  role                                                    String                     @default("NURSE")
+  specialization                                          String?
+  licenseNumber                                           String?
+  licenseExpiry                                           String?
+  department                                              String?
+  avatarUrl                                               String?
+  isActive                                                Boolean                    @default(true)
+  hireDate                                                String?
+  createdAt                                               DateTime                   @default(now())
+  updatedAt      DateTime @updatedAt
+  MedicationAdministration                                MedicationAdministration[]
+  NurseShiftAssignment                                    NurseShiftAssignment[]
+  NurseTask                                               NurseTask[]
+  NursingNote                                             NursingNote[]
+  ShiftHandoff_ShiftHandoff_receivedByNurseIdToNurseStaff ShiftHandoff[]             @relation("ShiftHandoff_receivedByNurseIdToNurseStaff")
+  ShiftHandoff_ShiftHandoff_givenByNurseIdToNurseStaff    ShiftHandoff[]             @relation("ShiftHandoff_givenByNurseIdToNurseStaff")
+  VitalSignsLog                                           VitalSignsLog[]
+
+  @@index([isActive])
+  @@index([role])
+  @@index([tenantId])
+}
+
+model NurseTask {
+  id          String   @id @default(cuid())
+  tenantId          String
+  patientId         String?
+  assignedToNurseId String?
+  title             String
+  description       String?
+  category          String      @default("general")
+  priority          String      @default("normal")
+  dueDate           String?
+  dueTime           String?
+  isRecurring       Boolean     @default(false)
+  recurringPattern  String?
+  recurringInterval Int?
+  status            String      @default("pending")
+  completedAt       String?
+  completedBy       String?
+  protocolId        String?
+  notes             String?
+  createdAt         DateTime    @default(now())
+  updatedAt      DateTime @updatedAt
+  NurseStaff        NurseStaff? @relation(fields: [assignedToNurseId], references: [id])
+
+  @@index([category])
+  @@index([dueDate])
+  @@index([status])
+  @@index([tenantId])
+}
+
+model NursingChecklist {
+  id          String   @id @default(cuid())
+  tenantId    String
+  name        String
+  description String?
+  category    String   @default("general")
+  items       String
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([category])
+  @@index([tenantId])
+}
+
+model NursingChecklistCompletion {
+  id          String   @id @default(cuid())
+  tenantId       String
+  checklistId    String
+  patientId      String?
+  nurseId        String
+  completedItems String
+  notes          String?
+  shiftDate      String
+  shiftType      String?
+  createdAt      DateTime @default(now())
+
+  @@index([checklistId])
+  @@index([tenantId])
+}
+
+model NursingNote {
+  id          String   @id @default(cuid())
+  tenantId       String
+  patientId      String
+  patientName    String
+  nurseId        String
+  nurseName      String?
+  noteType       String     @default("progress")
+  title          String?
+  content        String
+  shiftDate      String?
+  shiftType      String?
+  isConfidential Boolean    @default(false)
+  tags           String?
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime @updatedAt
+  NurseStaff     NurseStaff @relation(fields: [nurseId], references: [id])
+
+  @@index([noteType])
+  @@index([patientId])
+  @@index([tenantId])
+}
+
+model NursingProtocol {
+  id          String   @id @default(cuid())
+  tenantId          String
+  name              String
+  category          String
+  description       String?
+  steps             String
+  warnings          String?
+  equipmentNeeded   String?
+  estimatedDuration Int?
+  isActive          Boolean  @default(true)
+  createdAt         DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([category])
+  @@index([tenantId])
+}
+
+model Patient {
+  id          String   @id @default(cuid())
+  tenantId          String
+  firstName         String
+  lastName          String
+  fullName          String
+  dateOfBirth       String?
+  gender            String?
+  bloodType         String?
+  email             String?
+  phone             String
+  phoneAlt          String?
+  address           String?
+  city              String?
+  country           String            @default("Trinidad & Tobago")
+  allergies         String?
+  medications       String?
+  conditions        String?
+  emergencyContact  String?
+  insuranceProvider String?
+  insuranceNumber   String?
+  insurancePlan     String?
+  patientNumber     String
+  status            String            @default("active")
+  notes             String?
+  tags              String?
+  avatarUrl         String?
+  isDeleted         Boolean           @default(false)
+  createdAt         DateTime          @default(now())
+  updatedAt      DateTime @updatedAt
+  Appointment       Appointment[]
+  Invoice           Invoice[]
+  MedicalRecord     MedicalRecord[]
+  PatientDocument   PatientDocument[]
+
+  @@index([phone])
+  @@index([patientNumber])
+  @@index([tenantId])
+}
+
+model PatientDocument {
+  id          String   @id @default(cuid())
+  tenantId     String
+  patientId    String
+  name         String
+  type         String
+  category     String?
+  fileUrl      String
+  fileSize     Int?
+  mimeType     String?
+  description  String?
+  tags         String?
+  documentDate String?
+  createdAt    DateTime @default(now())
+  Patient      Patient  @relation(fields: [patientId], references: [id])
+
+  @@index([patientId])
+  @@index([tenantId])
+}
+
+model PaymentVerification {
+  id          String   @id @default(cuid())
+  salesOrderId       String
+  orderNumber        String
+  verificationMethod String
+  status             String     @default("pending")
+  transactionId      String?
+  gatewayResponse    String?
+  receiptFileUrl     String?
+  reviewedBy         String?
+  reviewedAt         String?
+  rejectionReason    String?
+  amountDeclared     Float?
+  amountVerified     Float?
+  currency           String     @default("TTD")
+  notes              String?
+  isDeleted          Boolean    @default(false)
+  createdAt          DateTime   @default(now())
+  updatedAt      DateTime @updatedAt
+  SalesOrder         SalesOrder @relation(fields: [salesOrderId], references: [id])
+
+  @@index([salesOrderId])
+  @@index([status])
+}
+
+model Plan {
+  id          String   @id @default(cuid())
+  slug             String   @unique
+  nameEn           String
+  nameEs           String
+  tier             String
+  priceMonthlyTtd  Float
+  priceAnnualTtd   Float
+  priceBiannualTtd Float
+  maxUsers         Int
+  maxBranches      Int
+  featuresEn       String?
+  featuresEs       String?
+  badgeEn          String?
+  badgeEs          String?
+  badgeColor       String?
+  isDeleted        Boolean  @default(false)
+  createdAt        DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([tier])
+  @@index([slug])
+}
+
+model Prescription {
+  id          String   @id @default(cuid())
+  tenantId                 String
+  patientId                String
+  patientName              String
+  providerId               String?
+  providerName             String?
+  prescriptionNumber       String
+  medication               String
+  dosage                   String
+  frequency                String
+  route                    String?
+  duration                 String?
+  quantity                 Int?
+  refills                  Int                        @default(0)
+  refillsRemaining         Int                        @default(0)
+  instructions             String?
+  warnings                 String?
+  status                   String                     @default("active")
+  startDate                String
+  endDate                  String?
+  notes                    String?
+  createdAt                DateTime                   @default(now())
+  updatedAt      DateTime @updatedAt
+  MedicationAdministration MedicationAdministration[]
+
+  @@index([status])
+  @@index([patientId])
+  @@index([tenantId])
+}
+
+model Provider {
+  id          String   @id @default(cuid())
+  tenantId       String
+  firstName      String
+  lastName       String
+  fullName       String
+  email          String?
+  phone          String?
+  specialization String?
+  licenseNumber  String?
+  workingHours   String?
+  isActive       Boolean  @default(true)
+  avatarUrl      String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([tenantId])
+}
+
+model ProvisioningJob {
+  id          String   @id @default(cuid())
+  salesOrderId        String
+  orderNumber         String
+  status              String     @default("queued")
+  tenantCreated       Boolean    @default(false)
+  nshTenantId         String?
+  subscriptionCreated Boolean    @default(false)
+  userProvisioned     Boolean    @default(false)
+  welcomeEmailSent    Boolean    @default(false)
+  invoiceGenerated    Boolean    @default(false)
+  auditLogged         Boolean    @default(false)
+  startedAt           String?
+  completedAt         String?
+  errorLog            String?
+  retryCount          Int        @default(0)
+  notes               String?
+  isDeleted           Boolean    @default(false)
+  createdAt           DateTime   @default(now())
+  updatedAt      DateTime @updatedAt
+  SalesOrder          SalesOrder @relation(fields: [salesOrderId], references: [id])
+
+  @@index([salesOrderId])
+  @@index([status])
+}
+
+model Reminder {
+  id          String   @id @default(cuid())
+  tenantId          String
+  type              String
+  title             String
+  message           String?
+  targetType        String
+  targetId          String?
+  targetEmail       String?
+  targetPhone       String?
+  scheduledFor      String
+  timezone          String   @default("America/Port_of_Spain")
+  channels          String
+  status            String   @default("pending")
+  sentAt            String?
+  failureReason     String?
+  relatedEntityType String?
+  relatedEntityId   String?
+  isRecurring       Boolean  @default(false)
+  recurringPattern  String?
+  nextOccurrence    String?
+  createdAt         DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([scheduledFor])
+  @@index([status])
+  @@index([tenantId])
+}
+
+model SalesAuditLog {
+  id          String   @id @default(cuid())
+  action           String
+  orderNumber      String?
+  salesOrderId     String?
+  performedBy      String?
+  performedByEmail String?
+  details          String?
+  severity         String      @default("info")
+  ipAddress        String?
+  userAgent        String?
+  metadata         String?
+  createdAt        DateTime    @default(now())
+  SalesOrder       SalesOrder? @relation(fields: [salesOrderId], references: [id])
+
+  @@index([createdAt])
+  @@index([action])
+}
+
+model SalesCoupon {
+  id          String   @id @default(cuid())
+  code          String   @unique
+  discountType  String
+  discountValue Float
+  appliesTo     String
+  maxUses       Int?
+  timesUsed     Int      @default(0)
+  validFrom     String?
+  validUntil    String?
+  status        String   @default("active")
+  description   String?
+  isDeleted     Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([status])
+  @@index([code])
+}
+
+model SalesOrder {
+  id          String   @id @default(cuid())
+  orderNumber             String                @unique
+  status                  String                @default("draft")
+  businessName            String
+  legalName               String?
+  businessAddress         String?
+  ownerName               String
+  ownerEmail              String
+  ownerPhone              String
+  industrySlug            String
+  industryName            String
+  country                 String                @default("Trinidad & Tobago")
+  planSlug                String
+  planName                String
+  planTier                String
+  billingCycle            String                @default("monthly")
+  planPriceTtd            Float
+  activationFeeTtd        Float                 @default(1250)
+  totalChargedTtd         Float
+  currencyUsed            String                @default("TTD")
+  paymentMethod           String?
+  paymentGatewaySessionId String?
+  transactionId           String?
+  receiptUrl              String?
+  paymentVerifiedAt       String?
+  paymentVerifiedBy       String?
+  nshTenantId             String?
+  nshTenantSlug           String?
+  invoiceNumber           String?
+  invoiceUrl              String?
+  welcomeEmailSentAt      String?
+  couponCode              String?
+  discountAmountTtd       Float                 @default(0)
+  notes                   String?
+  languagePreference      String                @default("en")
+  utmSource               String?
+  utmMedium               String?
+  utmCampaign             String?
+  ipAddress               String?
+  isDeleted               Boolean               @default(false)
+  createdAt               DateTime              @default(now())
+  updatedAt      DateTime @updatedAt
+  PaymentVerification     PaymentVerification[]
+  ProvisioningJob         ProvisioningJob[]
+  SalesAuditLog           SalesAuditLog[]
+
+  @@index([createdAt])
+  @@index([industrySlug])
+  @@index([ownerEmail])
+  @@index([status])
+}
+
+model Session {
+  id          String   @id @default(cuid())
+  sessionToken String     @unique
+  userId       String
+  expires      DateTime
+  SystemUser   SystemUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model ShiftHandoff {
+  id          String   @id @default(cuid())
+  tenantId                                              String
+  givenByNurseId                                        String
+  receivedByNurseId                                     String?
+  shiftDate                                             String
+  shiftType                                             String?
+  situation                                             String?
+  background                                            String?
+  assessment                                            String?
+  recommendation                                        String?
+  pendingTasks                                          String?
+  criticalAlerts                                        String?
+  medicationsDue                                        String?
+  status                                                String      @default("pending")
+  acknowledgedAt                                        String?
+  notes                                                 String?
+  createdAt                                             DateTime    @default(now())
+  updatedAt      DateTime @updatedAt
+  NurseStaff_ShiftHandoff_receivedByNurseIdToNurseStaff NurseStaff? @relation("ShiftHandoff_receivedByNurseIdToNurseStaff", fields: [receivedByNurseId], references: [id])
+  NurseStaff_ShiftHandoff_givenByNurseIdToNurseStaff    NurseStaff  @relation("ShiftHandoff_givenByNurseIdToNurseStaff", fields: [givenByNurseId], references: [id])
+
+  @@index([status])
+  @@index([shiftDate])
+  @@index([tenantId])
+}
+
+model SystemSetting {
+  id          String   @id @default(cuid())
+  key         String   @unique
+  value       String
+  description String?
+  isPublic    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([key])
+}
+
+model SystemUser {
+  id          String   @id @default(cuid())
+  tenantId          String?
+  email             String    @unique
+  passwordHash      String
+  name              String
+  role              String    @default("TENANT_USER")
+  avatarUrl         String?
+  phone             String?
+  isActive          Boolean   @default(true)
+  lastLoginAt       String?
+  twoFactorEnabled  Boolean   @default(false)
+  twoFactorSecret   String?
+  resetToken        String?
+  resetTokenExpires String?
+  createdAt         DateTime  @default(now())
+  updatedAt      DateTime @updatedAt
+  Account           Account[]
+  Session           Session[]
+
+  @@index([tenantId])
+  @@index([email])
+}
+
+model Tenant {
+  id          String   @id @default(cuid())
+  slug               String   @unique
+  businessName       String
+  legalName          String?
+  industrySlug       String
+  ownerName          String
+  ownerEmail         String
+  ownerPhone         String
+  planSlug           String
+  billingCycle       String
+  status             String   @default("trial")      // trial, active, past_due, suspended, cancelled
+  isTrial            Boolean  @default(true)          // Es período de prueba
+  trialStartsAt      String?                          // Inicio del trial
+  trialEndsAt        String?                          // Fin del trial (12am del último día)
+  activatedAt        String?                          // Cuándo se activó (pagó)
+  currentPeriodStart String?
+  currentPeriodEnd   String?
+  cancelledAt        String?
+  suspendedAt        String?                          // Cuándo se suspendió por no pago
+  gracePeriodEndsAt  String?                          // Período de gracia para exportar datos
+  settings           String?
+  isDeleted          Boolean  @default(false)
+  createdAt          DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  TenantSubscription TenantSubscription[]
+  TermsAcceptance    TermsAcceptance[]
+
+  @@index([status])
+  @@index([ownerEmail])
+  @@index([slug])
+}
+
+// Subscription tracking for tenants
+model TenantSubscription {
+  id          String   @id @default(cuid())
+  tenantId                String
+  planSlug                String
+  planName                String
+  billingCycle            String           // monthly, annual, biannual
+  priceTtd                Float
+  status                  String           @default("active") // active, past_due, cancelled, expired
+  currentPeriodStart      String
+  currentPeriodEnd        String
+  trialConvertedAt        String?          // Si se convirtió de trial
+  cancelledAt             String?
+  cancelReason            String?
+  lastPaymentAt           String?
+  lastPaymentAmount       Float?
+  lastPaymentMethod       String?
+  nextBillingDate         String?
+  wiPaySubscriptionId     String?          // ID de suscripción WiPay
+  invoiceCount            Int              @default(0)
+  totalBilledTtd          Float            @default(0)
+  notes                   String?
+  createdAt               DateTime         @default(now())
+  updatedAt      DateTime @updatedAt
+  Tenant                  Tenant           @relation(fields: [tenantId], references: [id])
+  TenantInvoice           TenantInvoice[]
+
+  @@index([status])
+  @@index([tenantId])
+  @@index([currentPeriodEnd])
+}
+
+// Invoices for tenant subscriptions
+model TenantInvoice {
+  id          String   @id @default(cuid())
+  tenantId                String
+  subscriptionId          String
+  invoiceNumber           String           @unique
+  issueDate               String
+  dueDate                 String
+  paidDate                String?
+  status                  String           @default("pending") // pending, paid, overdue, cancelled
+  subtotalTtd             Float
+  taxTtd                  Float            @default(0)
+  discountTtd             Float            @default(0)
+  totalTtd                Float
+  amountPaidTtd           Float            @default(0)
+  balanceDueTtd           Float
+  paymentMethod           String?
+  paymentReference        String?
+  wiPayTransactionId      String?
+  receiptUrl              String?
+  pdfUrl                  String?
+  notes                   String?
+  reminderSentAt          String?
+  createdAt               DateTime         @default(now())
+  updatedAt      DateTime @updatedAt
+  TenantSubscription      TenantSubscription @relation(fields: [subscriptionId], references: [id])
+
+  @@index([status])
+  @@index([tenantId])
+  @@index([invoiceNumber])
+  @@index([dueDate])
+}
+
+// Terms and Conditions acceptance tracking
+model TermsAcceptance {
+  id          String   @id @default(cuid())
+  tenantId              String
+  userId                String?           // SystemUser ID if logged in
+  userEmail             String
+  userName              String?
+  termsVersion          String            @default("1.0")
+  privacyVersion        String            @default("1.0")
+  acceptedAt            String
+  ipAddress             String?
+  userAgent             String?
+  acceptedDuring        String            @default("registration") // registration, login, checkout
+  pdfUrl                String?           // Copy of terms at time of acceptance
+  createdAt             DateTime          @default(now())
+  Tenant                Tenant            @relation(fields: [tenantId], references: [id])
+
+  @@index([tenantId])
+  @@index([userEmail])
+}
+
+// Data export requests (for expired/suspended tenants)
+model DataExportRequest {
+  id          String   @id @default(cuid())
+  tenantId              String
+  requestedBy           String            // email
+  requestType           String            @default("full") // full, partial
+  entitiesIncluded      String?           // JSON array of exported entities
+  status                String            @default("pending") // pending, processing, ready, expired
+  fileUrl               String?
+  fileSizeMb            Float?
+  expiresAt             String?           // Download link expiration
+  downloadedAt          String?
+  createdAt             DateTime          @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([tenantId])
+  @@index([status])
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model VitalSignsLog {
+  id          String   @id @default(cuid())
+  tenantId               String
+  patientId              String
+  patientName            String
+  nurseId                String?
+  nurseName              String?
+  recordedAt             String
+  bloodPressureSystolic  Int?
+  bloodPressureDiastolic Int?
+  bloodPressure          String?
+  heartRate              Int?
+  temperature            Float?
+  temperatureF           Float?
+  respiratoryRate        Int?
+  oxygenSaturation       Int?
+  weight                 Float?
+  height                 Float?
+  bmi                    Float?
+  bloodGlucose           Float?
+  bloodGlucoseType       String?
+  painLevel              Int?
+  painLocation           String?
+  notes                  String?
+  alertTriggered         Boolean     @default(false)
+  alertReason            String?
+  createdAt              DateTime    @default(now())
+  NurseStaff             NurseStaff? @relation(fields: [nurseId], references: [id])
+
+  @@index([recordedAt])
+  @@index([patientId])
+  @@index([tenantId])
+}
+
+// ============================================
+// BAKERY / PASTELERÍA - MODELOS COMPLETOS
+// ============================================
+
+// ===== PRODUCTOS =====
+model BakeryProduct {
+  id                String   @id @default(cuid())
+  tenantId          String
+  
+  // Información básica
+  sku               String
+  name              String
+  description       String?
+  category          String   @default("BREAD")
+  subcategory       String?
+  
+  // Precios
+  basePrice         Float
+  costPrice         Float    @default(0)
+  currency          String   @default("TTD")
+  
+  // Inventario
+  trackInventory    Boolean  @default(true)
+  stockQuantity     Float    @default(0)
+  minStock          Float    @default(0)
+  unit              String   @default("unidad")
+  
+  // Producción
+  productionTime    Int?
+  shelfLife         Int?
+  recipeId          String?
+  isCustomizable    Boolean  @default(false)
+  
+  // Presentación
+  imageUrl          String?
+  allergens         String?
+  nutritionalInfo   String?
+  
+  // Estado
+  isActive          Boolean  @default(true)
+  isFeatured        Boolean  @default(false)
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  @@unique([tenantId, sku])
+  @@index([tenantId])
+  @@index([category])
+  @@index([isActive])
+}
+
+model BakeryProductVariant {
+  id                String   @id @default(cuid())
+  tenantId          String
+  productId         String
+  
+  name              String
+  sku               String
+  priceModifier     Float    @default(0)
+  weight            Float?
+  portions          Int?
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  @@index([tenantId])
+  @@index([productId])
+}
+
+// ===== RECETAS Y PRODUCCIÓN =====
+model BakeryRecipe {
+  id                String   @id @default(cuid())
+  tenantId          String
+  
+  name              String
+  description       String?
+  portions          Int      @default(1)
+  prepTime          Int?
+  bakeTime          Int?
+  bakeTemp          Int?
+  instructions      String?
+  tips              String?
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  @@index([tenantId])
+}
+
+model BakeryRecipeIngredient {
+  id                String   @id @default(cuid())
+  tenantId          String
+  recipeId          String
+  ingredientId      String
+  
+  quantity          Float
+  unit              String
+  
+  createdAt         DateTime @default(now())
+  
+  @@index([tenantId])
+  @@index([recipeId])
+  @@index([ingredientId])
+}
+
+model BakeryIngredient {
+  id                String   @id @default(cuid())
+  tenantId          String
+  
+  sku               String?
+  name              String
+  category          String?
+  
+  // Inventario
+  currentStock      Float    @default(0)
+  minStock          Float    @default(0)
+  unit              String
+  
+  // Costos
+  unitCost          Float    @default(0)
+  currency          String   @default("TTD")
+  
+  // Proveedor
+  supplierId        String?
+  supplierSku       String?
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  @@index([tenantId])
+  @@index([name])
+}
+
+// ===== PEDIDOS =====
+model BakeryOrder {
+  id                String   @id @default(cuid())
+  tenantId          String
+  
+  orderNumber       String
+  orderType         String   @default("POS")
+  
+  // Cliente
+  customerId        String?
+  customerName      String
+  customerPhone     String?
+  customerEmail     String?
+  
+  // Entrega
+  deliveryType      String   @default("PICKUP")
+  deliveryAddress   String?
+  deliveryDate      String?
+  deliveryTime      String?
+  deliveryNotes     String?
+  
+  // Pedido especial (tortas)
+  isCustomOrder     Boolean  @default(false)
+  customDetails     String?
+  
+  // Montos
+  subtotal          Float
+  discount          Float    @default(0)
+  deliveryFee       Float    @default(0)
+  tax               Float    @default(0)
+  total             Float
+  currency          String   @default("TTD")
+  
+  // Pago
+  paymentStatus     String   @default("PENDING")
+  paymentMethod     String?
+  paymentReference  String?
+  
+  // Estado
+  status            String   @default("RECEIVED")
+  notes             String?
+  
+  // Producción
+  productionStatus  String?
+  productionNotes   String?
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  @@unique([tenantId, orderNumber])
+  @@index([tenantId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model BakeryOrderItem {
+  id                String   @id @default(cuid())
+  tenantId          String
+  orderId           String
+  
+  productId         String?
+  variantId         String?
+  
+  productName       String
+  variantName       String?
+  quantity          Float
+  unitPrice         Float
+  totalPrice        Float
+  
+  notes             String?
+  
+  createdAt         DateTime @default(now())
+  
+  @@index([tenantId])
+  @@index([orderId])
+}
+
+// ===== CLIENTES =====
+model BakeryCustomer {
+  id                String   @id @default(cuid())
+  tenantId          String
+  
+  name              String
+  email             String?
+  phone             String
+  address           String?
+  
+  // Fidelidad
+  loyaltyPoints     Int      @default(0)
+  loyaltyTier       String   @default("bronze")
+  totalPurchases    Float    @default(0)
+  ordersCount       Int      @default(0)
+  
+  // Cumpleaños
+  birthday          String?
+  
+  // Preferencias
+  preferences       String?
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  @@index([tenantId])
+  @@index([phone])
+}
+
+// ===== FACTURACIÓN =====
+model BakeryInvoice {
+  id                String   @id @default(cuid())
+  tenantId          String
+  
+  invoiceNumber     String
+  orderId           String?
+  
+  // Datos fiscales
+  customerTaxId     String?
+  customerName      String
+  customerAddress   String?
+  
+  // Montos
+  subtotal          Float
+  taxRate           Float    @default(0)
+  taxAmount         Float    @default(0)
+  total             Float
+  currency          String   @default("TTD")
+  
+  // Estado
+  status            String   @default("DRAFT")
+  paidAt            String?
+  
+  // PDF
+  pdfUrl            String?
+  
+  createdAt         DateTime @default(now())
+  
+  @@unique([tenantId, invoiceNumber])
+  @@index([tenantId])
+  @@index([status])
+}
+
+// ===== PRODUCCIÓN =====
+model BakeryProductionPlan {
+  id                String   @id @default(cuid())
+  tenantId          String
+  
+  date              String
+  shift             String?
+  
+  status            String   @default("SCHEDULED")
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  @@index([tenantId])
+  @@index([date])
+}
+
+model BakeryProductionItem {
+  id                String   @id @default(cuid())
+  tenantId          String
+  planId            String
+  productId         String?
+  
+  productName       String
+  quantity          Float
+  quantityProduced  Float    @default(0)
+  quantityWasted    Float    @default(0)
+  
+  assignedTo        String?
+  startTime         String?
+  endTime           String?
+  
+  notes             String?
+  
+  createdAt         DateTime @default(now())
+  
+  @@index([tenantId])
+  @@index([planId])
+}
+
+// ===== COMPRAS A PROVEEDORES =====
+model BakeryPurchaseOrder {
+  id                String   @id @default(cuid())
+  tenantId          String
+  
+  orderNumber       String
+  supplierId        String?
+  supplierName      String
+  
+  status            String   @default("DRAFT")
+  expectedDate      String?
+  receivedDate      String?
+  
+  subtotal          Float    @default(0)
+  tax               Float    @default(0)
+  total             Float    @default(0)
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  @@unique([tenantId, orderNumber])
+  @@index([tenantId])
+  @@index([status])
+}
+
+model BakeryPurchaseItem {
+  id                String   @id @default(cuid())
+  tenantId          String
+  purchaseOrderId   String
+  ingredientId      String?
+  
+  ingredientName    String
+  quantity          Float
+  unitCost          Float    @default(0)
+  totalCost         Float    @default(0)
+  
+  quantityReceived  Float    @default(0)
+  
+  createdAt         DateTime @default(now())
+  
+  @@index([tenantId])
+  @@index([purchaseOrderId])
+}
+
+// ===== CONTABILIDAD =====
+model BakeryJournalEntry {
+  id                String   @id @default(cuid())
+  tenantId          String
+  
+  entryNumber       String
+  date              String
+  description       String
+  
+  reference         String?
+  referenceType     String?
+  
+  isPosted          Boolean  @default(false)
+  postedAt          String?
+  
+  createdAt         DateTime @default(now())
+  
+  @@unique([tenantId, entryNumber])
+  @@index([tenantId])
+  @@index([date])
+}
+
+model BakeryJournalLine {
+  id                String   @id @default(cuid())
+  tenantId          String
+  entryId           String
+  
+  accountId         String
+  accountName       String
+  description       String?
+  
+  debit             Float    @default(0)
+  credit            Float    @default(0)
+  
+  createdAt         DateTime @default(now())
+  
+  @@index([tenantId])
+  @@index([entryId])
+}
+
+// ===== CAJA (POS) =====
+model BakeryCashRegister {
+  id                String   @id @default(cuid())
+  tenantId          String
+  
+  name              String
+  location          String?
+  
+  isOpen            Boolean  @default(false)
+  openedAt          String?
+  openedBy          String?
+  openingBalance    Float    @default(0)
+  
+  currentBalance    Float    @default(0)
+  
+  closedAt          String?
+  closedBy          String?
+  closingBalance    Float    @default(0)
+  difference        Float    @default(0)
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  @@index([tenantId])
+  @@index([isOpen])
+}
+
+model BakeryCashTransaction {
+  id                String   @id @default(cuid())
+  tenantId          String
+  registerId        String
+  
+  type              String
+  amount            Float
+  description       String?
+  
+  reference         String?
+  
+  createdAt         DateTime @default(now())
+  
+  @@index([tenantId])
+  @@index([registerId])
+}
+
+// ===== CONFIGURACIÓN FISCAL =====
+model BakeryTaxConfig {
+  id                String   @id @default(cuid())
+  tenantId          String
+  
+  name              String
+  rate              Float    @default(0)
+  
+  taxNumber         String?
+  taxIdType         String?
+  
+  isDefault         Boolean  @default(false)
+  isActive          Boolean  @default(true)
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  @@index([tenantId])
+}
+
+// ===== CONFIGURACIÓN DE PANADERÍA =====
+model BakerySettings {
+  id                String   @id @default(cuid())
+  tenantId          String   @unique
+  
+  bakeryName        String
+  legalName         String?
+  taxId             String?
+  
+  email             String?
+  phone             String?
+  website           String?
+  whatsapp          String?
+  
+  address           String?
+  city              String?
+  country           String   @default("Trinidad & Tobago")
+  
+  logoUrl           String?
+  primaryColor      String   @default("#F97316")
+  secondaryColor    String   @default("#FBBF24")
+  accentColor       String   @default("#78350F")
+  
+  currency          String   @default("TTD")
+  currencySymbol    String   @default("TT$")
+  
+  taxEnabled        Boolean  @default(false)
+  taxRate           Float    @default(0)
+  taxName           String?
+  taxNumber         String?
+  
+  defaultOpeningTime String  @default("06:00")
+  defaultClosingTime String  @default("20:00")
+  defaultWorkingDays String  @default("monday,tuesday,wednesday,thursday,friday,saturday,sunday")
+  
+  productionStart   String   @default("04:00")
+  lastOrderTime     String   @default("19:00")
+  
+  reminderEnabled   Boolean  @default(true)
+  reminderHours     Int      @default(24)
+  
+  loyaltyEnabled    Boolean  @default(false)
+  pointsPerDollar   Float    @default(1)
+  pointsRedeemRate  Float    @default(100)
+  
+  wiPayEnabled      Boolean  @default(false)
+  wiPayApiKey       String?
+  
+  offlineMode       Boolean  @default(true)
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  @@index([tenantId])
+}
+
+// ===== PROVEEDORES =====
+model BakerySupplier {
+  id                String   @id @default(cuid())
+  tenantId          String
+  
+  name              String
+  contactName       String?
+  email             String?
+  phone             String?
+  address           String?
+  
+  taxId             String?
+  paymentTerms      String?
+  
+  notes             String?
+  isActive          Boolean  @default(true)
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  @@index([tenantId])
+  @@index([name])
+}
+
+// ===== PERSONAL =====
+model BakeryStaff {
+  id                String   @id @default(cuid())
+  tenantId          String
+  
+  firstName         String
+  lastName          String
+  fullName          String
+  email             String?
+  phone             String?
+  
+  role              String   @default("BAKER")
+  position          String?
+  
+  workingHours      String?
+  workingDays       String?
+  
+  hourlyRate        Float?
+  salary            Float?
+  
+  isActive          Boolean  @default(true)
+  hireDate          String?
+  
+  avatarUrl         String?
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  @@index([tenantId])
+  @@index([isActive])
+}
+
+// ============================================
+// CAPACITY NOTIFICATION SYSTEM
+// ============================================
+
+// Capacity Alert Model - Stores individual alerts
+model CapacityNotification {
+  id                String   @id @default(cuid())
+  tenantId          String?
+  
+  // Alert identification
+  alertType         String   // bandwidth, functionInvocations, buildMinutes, storage, apiCalls
+  severity          String   // info, warning, critical
+  
+  // Threshold information
+  threshold         Int      // 50, 75, 90
+  currentUsage      Float
+  limit             Float
+  percentage        Float
+  
+  // Alert content
+  title             String
+  message           String
+  details           String?  // JSON for additional data
+  
+  // Status
+  status            String   @default("active") // active, acknowledged, dismissed, resolved
+  
+  // Notification tracking
+  emailSent         Boolean  @default(false)
+  emailSentAt       String?
+  inAppShown        Boolean  @default(false)
+  
+  // Acknowledgment
+  acknowledgedBy    String?
+  acknowledgedAt    String?
+  acknowledgedNote  String?
+  
+  // Resolution
+  resolvedAt        String?
+  resolvedBy        String?
+  resolutionNote    String?
+  
+  // Timestamps
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  @@index([tenantId])
+  @@index([alertType])
+  @@index([severity])
+  @@index([status])
+  @@index([createdAt])
+}
+
+// Notification Preferences per Tenant
+model NotificationSettings {
+  id                      String   @id @default(cuid())
+  tenantId                String   @unique
+  
+  // Master toggle
+  notificationsEnabled    Boolean  @default(true)
+  
+  // Delivery channels
+  emailNotifications      Boolean  @default(true)
+  inAppNotifications      Boolean  @default(true)
+  
+  // Notification mode: immediate or digest
+  notificationMode        String   @default("immediate") // immediate, digest
+  
+  // Digest settings
+  digestFrequency         String   @default("daily") // hourly, daily, weekly
+  digestTime              String   @default("09:00") // Time to send digest
+  lastDigestSentAt        String?
+  
+  // Threshold preferences
+  alertAt50               Boolean  @default(true)
+  alertAt75               Boolean  @default(true)
+  alertAt90               Boolean  @default(true)
+  
+  // Metric-specific settings (JSON)
+  bandwidthAlerts         Boolean  @default(true)
+  functionAlerts          Boolean  @default(true)
+  buildMinutesAlerts      Boolean  @default(true)
+  storageAlerts           Boolean  @default(true)
+  apiCallsAlerts          Boolean  @default(true)
+  
+  // Email recipients (comma-separated or JSON)
+  adminEmails             String?  // Additional admin emails
+  
+  // Quiet hours
+  quietHoursEnabled       Boolean  @default(false)
+  quietHoursStart         String?  // e.g., "22:00"
+  quietHoursEnd           String?  // e.g., "06:00"
+  
+  // Escalation settings
+  escalationEnabled       Boolean  @default(false)
+  escalationEmail        String?  // Escalation email for critical alerts
+  escalationDelayMinutes Int      @default(30)  // Minutes before escalating
+  
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
+  
+  @@index([tenantId])
+}
+
+// Digest queue for batch notifications
+model NotificationDigest {
+  id                String   @id @default(cuid())
+  tenantId          String?
+  
+  // Digest period
+  periodStart       String
+  periodEnd         String
+  
+  // Content
+  alertCount        Int      @default(0)
+  criticalCount     Int      @default(0)
+  warningCount      Int      @default(0)
+  infoCount         Int      @default(0)
+  
+  // Summary
+  summary           String?  // JSON summary of alerts
+  
+  // Status
+  status            String   @default("pending") // pending, sent, failed
+  sentAt            String?
+  error             String?
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  @@index([tenantId])
+  @@index([status])
+  @@index([periodStart])
+}
+
+// Usage metrics snapshot for trend analysis
+model UsageMetricSnapshot {
+  id                    String   @id @default(cuid())
+  tenantId              String?
+  
+  // Timestamp
+  snapshotDate          String
+  snapshotHour          Int      // 0-23 for hourly snapshots
+  
+  // Vercel metrics
+  bandwidthUsed         Float    @default(0)
+  functionInvocations   Int      @default(0)
+  buildMinutesUsed      Int      @default(0)
+  
+  // GitHub metrics
+  storageUsed           Float    @default(0)
+  actionsMinutesUsed    Int      @default(0)
+  
+  // API metrics
+  apiCallsCount         Int      @default(0)
+  
+  // Database metrics
+  databaseSize          Float    @default(0)
+  rowCount              Int      @default(0)
+  
+  // Computed
+  tenantCount           Int      @default(0)
+  activeUsers           Int      @default(0)
+  
+  createdAt             DateTime @default(now())
+  
+  @@index([tenantId])
+  @@index([snapshotDate])
+  @@index([snapshotHour])
+}
+
+// Alert history for audit trail
+model AlertHistory {
+  id                String   @id @default(cuid())
+  tenantId          String?
+  notificationId    String?
+  
+  // Event details
+  eventType         String   // created, acknowledged, dismissed, resolved, escalated
+  previousStatus    String?
+  newStatus         String?
+  
+  // Actor
+  performedBy       String?
+  performedByEmail  String?
+  
+  // Additional info
+  notes             String?
+  metadata          String?  // JSON for additional context
+  
+  createdAt         DateTime @default(now())
+  
+  @@index([tenantId])
+  @@index([notificationId])
+  @@index([eventType])
+  @@index([createdAt])
+}
+
+// ============================================
+// DATA MIGRATION SYSTEM
+// ============================================
+
+// Migration Session - Tracks import sessions
+model MigrationSession {
+  id                String   @id @default(cuid())
+  tenantId          String
+  
+  // Session info
+  userId            String
+  userEmail         String?
+  
+  // Status tracking
+  status            String   @default("pending") // pending, parsing, mapping, validating, ready, executing, completed, failed, rolled_back
+  
+  // Source info
+  sourceSystem      String   // excel, csv, json, quickbooks, square, other
+  entityType        String   // products, customers, orders, suppliers, ingredients, staff
+  
+  // File info
+  fileName          String
+  fileSize          Int      @default(0)
+  
+  // Progress
+  totalRecords      Int      @default(0)
+  processedRecords  Int      @default(0)
+  successfulRecords Int      @default(0)
+  failedRecords     Int      @default(0)
+  
+  // Configuration
+  fieldMappings     String?  // JSON array of FieldMapping
+  validationErrors  String?  // JSON array of ValidationError
+  processingErrors  String?  // JSON array of processing errors
+  
+  // Timestamps
+  startedAt         String?
+  completedAt       String?
+  rolledBackAt      String?
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  @@index([tenantId])
+  @@index([status])
+  @@index([entityType])
+  @@index([createdAt])
+}
+
+// Migration Rollback Record - Tracks records for rollback
+model MigrationRollbackRecord {
+  id                String   @id @default(cuid())
+  migrationId       String
+  
+  // Entity info
+  entityType        String
+  entityId          String
+  
+  // Action type
+  action            String   // create, update, delete
+  
+  // Original data (for restore)
+  originalData      String?  // JSON of original entity data
+  
+  // Timestamp
+  createdAt         DateTime @default(now())
+  
+  @@index([migrationId])
+  @@index([entityType])
+  @@index([entityId])
+}

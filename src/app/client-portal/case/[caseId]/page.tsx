@@ -30,7 +30,7 @@ import {
   ClientMessaging,
   ClientUpload,
 } from '@/components/lawfirm/portal';
-import { getPortalCaseInfo } from '../actions';
+import { getPortalCaseInfo } from '@/app/client-portal/actions';
 
 interface CaseData {
   id: string;

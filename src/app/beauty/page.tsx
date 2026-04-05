@@ -15,24 +15,40 @@ import { BeautySettings } from "@/components/beauty/beauty-settings";
 import { BeautyAccounting } from "@/components/beauty/beauty-accounting";
 import { BeautyBranches } from "@/components/beauty/beauty-branches";
 import { BeautyRoute } from "@/components/auth/protected-layout";
+import { useAppTranslation } from "@/hooks/use-app-translation";
 
-const menuItems = [
-  { id: "dashboard", label: "Dashboard", icon: "LayoutDashboard" },
-  { id: "branches", label: "Sedes", icon: "Building2" },
-  { id: "appointments", label: "Citas", icon: "Calendar" },
-  { id: "pos", label: "Punto de Venta", icon: "ShoppingCart" },
-  { id: "clients", label: "Clientes", icon: "Users" },
-  { id: "staff", label: "Equipo", icon: "UserCircle" },
-  { id: "services", label: "Servicios", icon: "Scissors" },
-  { id: "products", label: "Productos", icon: "Package" },
-  { id: "finances", label: "Finanzas", icon: "DollarSign" },
-  { id: "accounting", label: "Contabilidad", icon: "BookOpen" },
-  { id: "reports", label: "Reportes", icon: "BarChart3" },
-  { id: "settings", label: "Configuración", icon: "Settings" },
-];
+// Beauty-specific translations
+const beautyTranslations = {
+  es: {
+    title: "AETHEL OS Beauty",
+    subtitle: "Sistema de Gestión para Salones",
+  },
+  en: {
+    title: "AETHEL OS Beauty",
+    subtitle: "Salon Management System",
+  },
+};
 
 function BeautyPageContent() {
   const [activeModule, setActiveModule] = useState("dashboard");
+  const { getSection, language } = useAppTranslation();
+  const t = getSection("navigation");
+  const beautyT = beautyTranslations[language];
+
+  const menuItems = [
+    { id: "dashboard", label: t.dashboard, icon: "LayoutDashboard" },
+    { id: "branches", label: t.branches, icon: "Building2" },
+    { id: "appointments", label: t.appointments, icon: "Calendar" },
+    { id: "pos", label: t.pos, icon: "ShoppingCart" },
+    { id: "clients", label: t.clients, icon: "Users" },
+    { id: "staff", label: t.staff, icon: "UserCircle" },
+    { id: "services", label: t.services, icon: "Scissors" },
+    { id: "products", label: t.products, icon: "Package" },
+    { id: "finances", label: t.finances, icon: "DollarSign" },
+    { id: "accounting", label: t.accounting, icon: "BookOpen" },
+    { id: "reports", label: t.reports, icon: "BarChart3" },
+    { id: "settings", label: t.settings, icon: "Settings" },
+  ];
 
   const renderContent = () => {
     switch (activeModule) {
@@ -67,8 +83,8 @@ function BeautyPageContent() {
 
   return (
     <DashboardLayout
-      title="NexusOS Beauty"
-      subtitle="Sistema de Gestión para Salones"
+      title={beautyT.title}
+      subtitle={beautyT.subtitle}
       menuItems={menuItems}
       activeModule={activeModule}
       onModuleChange={setActiveModule}

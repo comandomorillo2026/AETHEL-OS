@@ -30,6 +30,7 @@ import {
   Globe,
 } from "lucide-react";
 import { useTheme } from "@/contexts/theme-context";
+import { useAppTranslation } from "@/hooks/use-app-translation";
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   LayoutDashboard,
@@ -78,6 +79,12 @@ export function DashboardLayout({
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const { theme, toggleTheme, language, toggleLanguage } = useTheme();
+  const { t, appTranslations } = useAppTranslation();
+
+  // Get translations for user section
+  const userSection = appTranslations.userSection;
+  const common = appTranslations.common;
+  const toggles = appTranslations.toggles;
 
   const getIcon = (iconName: string) => {
     const IconComponent = iconMap[iconName] || LayoutDashboard;
@@ -109,7 +116,7 @@ export function DashboardLayout({
             size="icon"
             className="text-white hover:bg-white/10"
             onClick={toggleTheme}
-            title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+            title={theme === 'dark' ? toggles.switchToLight : toggles.switchToDark}
           >
             {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
           </Button>
@@ -118,7 +125,7 @@ export function DashboardLayout({
             size="icon"
             className="text-white hover:bg-white/10"
             onClick={toggleLanguage}
-            title={language === 'es' ? 'Switch to English' : 'Cambiar a Español'}
+            title={language === 'es' ? toggles.switchToEnglish : toggles.switchToSpanish}
           >
             <Globe className="h-5 w-5" />
           </Button>
@@ -179,7 +186,7 @@ export function DashboardLayout({
               className="flex items-center gap-3 px-3 py-2.5 text-muted-foreground hover:bg-accent hover:text-accent-foreground rounded-lg transition-colors"
             >
               <Home className="h-5 w-5" />
-              {sidebarOpen && <span className="font-medium">Inicio AETHEL OS</span>}
+              {sidebarOpen && <span className="font-medium">{common.home}</span>}
             </a>
 
             <div className="my-3 border-t border-border" />
@@ -240,7 +247,7 @@ export function DashboardLayout({
               <>
                 <div className="flex-1 text-left">
                   <p className="text-sm font-medium text-foreground">Juan Dueño</p>
-                  <p className="text-xs text-muted-foreground">Administrador</p>
+                  <p className="text-xs text-muted-foreground">{userSection.administrator}</p>
                 </div>
                 <ChevronDown className="h-4 w-4 text-muted-foreground" />
               </>
@@ -251,20 +258,20 @@ export function DashboardLayout({
             <div className="mt-2 bg-popover border border-border rounded-lg shadow-lg">
               <button className="w-full flex items-center gap-2 px-3 py-2 text-sm text-muted-foreground hover:bg-accent hover:text-accent-foreground">
                 <User className="h-4 w-4" />
-                Mi Perfil
+                {userSection.profile}
               </button>
               <button className="w-full flex items-center gap-2 px-3 py-2 text-sm text-muted-foreground hover:bg-accent hover:text-accent-foreground">
                 <Settings className="h-4 w-4" />
-                Preferencias
+                {userSection.preferences}
               </button>
               <button className="w-full flex items-center gap-2 px-3 py-2 text-sm text-muted-foreground hover:bg-accent hover:text-accent-foreground">
                 <HelpCircle className="h-4 w-4" />
-                Ayuda
+                {userSection.help}
               </button>
               <div className="border-t border-border" />
               <button className="w-full flex items-center gap-2 px-3 py-2 text-sm text-destructive hover:bg-destructive/10">
                 <LogOut className="h-4 w-4" />
-                Cerrar Sesión
+                {userSection.logout}
               </button>
             </div>
           )}
@@ -291,7 +298,7 @@ export function DashboardLayout({
               size="icon"
               onClick={toggleTheme}
               className="text-muted-foreground hover:text-foreground hover:bg-accent"
-              title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+              title={theme === 'dark' ? toggles.switchToLight : toggles.switchToDark}
             >
               {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
             </Button>
@@ -301,7 +308,7 @@ export function DashboardLayout({
               size="sm"
               onClick={toggleLanguage}
               className="text-muted-foreground hover:text-foreground hover:bg-accent gap-1.5 px-3"
-              title={language === 'es' ? 'Switch to English' : 'Cambiar a Español'}
+              title={language === 'es' ? toggles.switchToEnglish : toggles.switchToSpanish}
             >
               <Globe className="h-4 w-4" />
               <span className="font-medium">{language.toUpperCase()}</span>

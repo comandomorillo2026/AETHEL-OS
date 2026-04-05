@@ -3,9 +3,8 @@ generator client {
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_DATABASE_URL")
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
 }
 
 model Account {
@@ -21,7 +20,7 @@ model Account {
   scope             String?
   id_token          String?
   session_state     String?
-  SystemUser        SystemUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+  SystemUser        SystemUser @relation(fields: [userId], references: [id])
 
   @@unique([provider, providerAccountId])
   @@index([userId])
@@ -1933,7 +1932,7 @@ model Session {
   sessionToken String     @unique
   userId       String
   expires      DateTime
-  SystemUser   SystemUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+  SystemUser   SystemUser @relation(fields: [userId], references: [id])
 
   @@index([userId])
 }

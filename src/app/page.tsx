@@ -13,6 +13,8 @@ import {
   Heart,
   Scale,
   Scissors,
+  Wine,
+  UtensilsCrossed,
   Menu,
   X,
   ChevronRight,
@@ -59,6 +61,10 @@ export default function OficinaCentral() {
       lawFirmsDesc: 'Casos, clientes, documentos, facturación de tiempo',
       beautySalons: 'Salones de Belleza',
       beautySalonsDesc: 'Citas, POS, inventario, contabilidad',
+      bars: 'Bares',
+      barsDesc: 'Gestión de bebidas, inventario, POS',
+      restaurants: 'Restaurantes',
+      restaurantsDesc: 'Comidas, bebidas, pedidos, mesas',
       seeMore: 'Ver más',
       readyCTA: '¿Listo para transformar tu negocio?',
       readyCTADesc: 'Visita nuestro Portal de Ventas para ver planes, precios detallados, características y solicitar tu demo gratuita.',
@@ -106,6 +112,10 @@ export default function OficinaCentral() {
       lawFirmsDesc: 'Cases, clients, documents, time billing',
       beautySalons: 'Beauty Salons',
       beautySalonsDesc: 'Appointments, POS, inventory, accounting',
+      bars: 'Bars',
+      barsDesc: 'Beverage management, inventory, POS',
+      restaurants: 'Restaurants',
+      restaurantsDesc: 'Food, drinks, orders, tables',
       seeMore: 'See more',
       readyCTA: 'Ready to transform your business?',
       readyCTADesc: 'Visit our Sales Portal to see plans, detailed pricing, features and request your free demo.',
@@ -394,7 +404,9 @@ export default function OficinaCentral() {
               { icon: Stethoscope, name: currentT.clinics, desc: currentT.clinicsDesc, color: '#22D3EE', href: '/portal?industry=clinic' },
               { icon: Heart, name: currentT.nursing, desc: currentT.nursingDesc, color: '#34D399', href: '/portal?industry=nurse' },
               { icon: Scale, name: currentT.lawFirms, desc: currentT.lawFirmsDesc, color: '#C4A35A', href: '/portal?industry=lawfirm' },
-              { icon: Scissors, name: currentT.beautySalons, desc: currentT.beautySalonsDesc, color: '#EC4899', href: '/portal?industry=beauty' }
+              { icon: Scissors, name: currentT.beautySalons, desc: currentT.beautySalonsDesc, color: '#EC4899', href: '/portal?industry=beauty' },
+              { icon: Wine, name: currentT.bars, desc: currentT.barsDesc, color: '#A855F7', href: '/bar' },
+              { icon: UtensilsCrossed, name: currentT.restaurants, desc: currentT.restaurantsDesc, color: '#F97316', href: '/restaurant' }
             ].map((industry, index) => (
               <Link 
                 key={index} 

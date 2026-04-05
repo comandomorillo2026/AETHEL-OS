@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useSearchParams } from "next/navigation";
 import { DashboardLayout } from "@/components/dashboard-layout";
 import { BakeryDashboard } from "@/components/bakery/bakery-dashboard";
@@ -15,32 +15,85 @@ import { BakeryPOS } from "@/components/bakery/bakery-pos";
 import { BakeryCatalogSettings } from "@/components/bakery/bakery-catalog-settings";
 import { CatalogAnalytics } from "@/components/bakery/bakery-catalog-analytics";
 import { BakeryRoute } from "@/components/auth/protected-layout";
+import { useAppTranslation } from "@/hooks/use-app-translation";
 
-const menuItems = [
-  { id: "dashboard", label: "Dashboard", icon: "LayoutDashboard" },
-  { id: "pos", label: "Punto de Venta", icon: "ShoppingCart" },
-  { id: "products", label: "Productos", icon: "Package" },
-  { id: "orders", label: "Pedidos", icon: "ClipboardList" },
-  { id: "production", label: "Produccion", icon: "ChefHat" },
-  { id: "customers", label: "Clientes", icon: "Users" },
-  { id: "invoices", label: "Facturas", icon: "FileText" },
-  { id: "reports", label: "Reportes", icon: "BarChart3" },
-  { id: "catalog", label: "Portal Productos", icon: "Store" },
-  { id: "analytics", label: "Analytics", icon: "TrendingUp" },
-  { id: "settings", label: "Configuracion", icon: "Settings" },
+// Translations for bakery menu items
+const bakeryTranslations = {
+  es: {
+    title: "AETHEL OS Bakery",
+    subtitle: "Sistema de Gestión para Panaderías",
+    menuItems: {
+      dashboard: "Dashboard",
+      pos: "Punto de Venta",
+      products: "Productos",
+      orders: "Pedidos",
+      production: "Producción",
+      customers: "Clientes",
+      invoices: "Facturas",
+      reports: "Reportes",
+      catalog: "Portal Productos",
+      analytics: "Analíticas",
+      settings: "Configuración",
+    },
+  },
+  en: {
+    title: "AETHEL OS Bakery",
+    subtitle: "Management System for Bakeries",
+    menuItems: {
+      dashboard: "Dashboard",
+      pos: "Point of Sale",
+      products: "Products",
+      orders: "Orders",
+      production: "Production",
+      customers: "Customers",
+      invoices: "Invoices",
+      reports: "Reports",
+      catalog: "Product Portal",
+      analytics: "Analytics",
+      settings: "Settings",
+    },
+  },
+};
+
+// Menu item configuration (without labels - labels come from translations)
+const menuItemConfig = [
+  { id: "dashboard", icon: "LayoutDashboard" },
+  { id: "pos", icon: "ShoppingCart" },
+  { id: "products", icon: "Package" },
+  { id: "orders", icon: "ClipboardList" },
+  { id: "production", icon: "ChefHat" },
+  { id: "customers", icon: "Users" },
+  { id: "invoices", icon: "FileText" },
+  { id: "reports", icon: "BarChart3" },
+  { id: "catalog", icon: "Store" },
+  { id: "analytics", icon: "TrendingUp" },
+  { id: "settings", icon: "Settings" },
 ];
 
 function BakeryPageContent() {
   const searchParams = useSearchParams();
+  const { language } = useAppTranslation();
   const [activeModule, setActiveModule] = useState("dashboard");
+
+  // Get translations based on current language
+  const translations = bakeryTranslations[language];
+
+  // Create menu items with translated labels
+  const menuItems = useMemo(() => {
+    return menuItemConfig.map((item) => ({
+      id: item.id,
+      label: translations.menuItems[item.id as keyof typeof translations.menuItems],
+      icon: item.icon,
+    }));
+  }, [translations]);
 
   // Handle URL tab parameter
   useEffect(() => {
     const tab = searchParams.get("tab");
-    if (tab && menuItems.some(item => item.id === tab)) {
+    if (tab && menuItems.some((item) => item.id === tab)) {
       setActiveModule(tab);
     }
-  }, [searchParams]);
+  }, [searchParams, menuItems]);
 
   const renderContent = () => {
     switch (activeModule) {
@@ -73,8 +126,8 @@ function BakeryPageContent() {
 
   return (
     <DashboardLayout
-      title="NexusOS Bakery"
-      subtitle="Sistema de Gestion para Panaderias"
+      title={translations.title}
+      subtitle={translations.subtitle}
       menuItems={menuItems}
       activeModule={activeModule}
       onModuleChange={setActiveModule}

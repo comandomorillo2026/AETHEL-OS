@@ -3,6 +3,7 @@
 import React from 'react';
 import { useAuth } from '@/lib/auth';
 import { useTheme } from '@/contexts/theme-context';
+import { useAppTranslation } from '@/hooks/use-app-translation';
 import { 
   LayoutDashboard, 
   Users, 
@@ -19,7 +20,6 @@ import {
   Package,
   BarChart3,
   Heart,
-  ClipboardList,
   Sun,
   Moon,
   Globe,
@@ -35,7 +35,13 @@ interface ClinicLayoutProps {
 export function ClinicLayout({ children, activeTab = 'dashboard', onTabChange }: ClinicLayoutProps) {
   const { user, logout } = useAuth();
   const { theme, toggleTheme, language, toggleLanguage } = useTheme();
+  const { appTranslations } = useAppTranslation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  // Get translations
+  const clinic = appTranslations.clinic;
+  const common = appTranslations.common;
+  const toggles = appTranslations.toggles;
 
   const handleNavClick = (tabId: string) => {
     if (onTabChange) {
@@ -44,18 +50,19 @@ export function ClinicLayout({ children, activeTab = 'dashboard', onTabChange }:
     setSidebarOpen(false);
   };
 
+  // Navigation items with translated labels
   const navItems = [
-    { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { id: 'patients', label: 'Pacientes', icon: Users },
-    { id: 'appointments', label: 'Citas', icon: Calendar },
-    { id: 'records', label: 'Expedientes', icon: FileText },
-    { id: 'billing', label: 'Facturación', icon: DollarSign },
-    { id: 'prescriptions', label: 'Recetas', icon: Pill },
-    { id: 'lab', label: 'Laboratorio', icon: FlaskConical },
-    { id: 'inventory', label: 'Inventario', icon: Package },
-    { id: 'nurse', label: 'Portal Enfermería', icon: Heart },
-    { id: 'reports', label: 'Reportes', icon: BarChart3 },
-    { id: 'settings', label: 'Configuración', icon: Settings },
+    { id: 'dashboard', label: clinic.dashboard, icon: LayoutDashboard },
+    { id: 'patients', label: clinic.patients, icon: Users },
+    { id: 'appointments', label: clinic.appointments, icon: Calendar },
+    { id: 'records', label: clinic.records, icon: FileText },
+    { id: 'billing', label: clinic.billing, icon: DollarSign },
+    { id: 'prescriptions', label: clinic.prescriptions, icon: Pill },
+    { id: 'lab', label: clinic.lab, icon: FlaskConical },
+    { id: 'inventory', label: clinic.inventory, icon: Package },
+    { id: 'nurse', label: clinic.nursePortal, icon: Heart },
+    { id: 'reports', label: clinic.reports, icon: BarChart3 },
+    { id: 'settings', label: clinic.settings, icon: Settings },
   ];
 
   return (
@@ -75,14 +82,14 @@ export function ClinicLayout({ children, activeTab = 'dashboard', onTabChange }:
           <button 
             onClick={toggleTheme}
             className="p-2 rounded-lg hover:bg-accent transition-colors"
-            title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+            title={theme === 'dark' ? toggles.switchToLight : toggles.switchToDark}
           >
             {theme === 'dark' ? <Sun className="w-5 h-5 text-muted-foreground" /> : <Moon className="w-5 h-5 text-muted-foreground" />}
           </button>
           <button 
             onClick={toggleLanguage}
             className="p-2 rounded-lg hover:bg-accent transition-colors"
-            title={language === 'es' ? 'Switch to English' : 'Cambiar a Español'}
+            title={language === 'es' ? toggles.switchToEnglish : toggles.switchToSpanish}
           >
             <Globe className="w-5 h-5 text-muted-foreground" />
           </button>
@@ -98,7 +105,7 @@ export function ClinicLayout({ children, activeTab = 'dashboard', onTabChange }:
         <div className="fixed inset-0 bg-black/50 z-50 md:hidden" onClick={() => setSidebarOpen(false)}>
           <aside className="w-64 h-full bg-card" onClick={(e) => e.stopPropagation()}>
             <div className="p-4 flex items-center justify-between border-b border-border">
-              <span className="font-bold text-foreground">Menú</span>
+              <span className="font-bold text-foreground">{common.menu}</span>
               <button onClick={() => setSidebarOpen(false)}>
                 <X className="w-5 h-5 text-muted-foreground" />
               </button>
@@ -138,7 +145,7 @@ export function ClinicLayout({ children, activeTab = 'dashboard', onTabChange }:
                 <h1 className="font-bold text-foreground" style={{ fontFamily: 'var(--font-cormorant)' }}>
                   NexusOS
                 </h1>
-                <p className="text-xs text-[var(--success)]">🏥 Clínica</p>
+                <p className="text-xs text-[var(--success)]">🏥 {language === 'es' ? 'Clínica' : 'Clinic'}</p>
               </div>
             </div>
           </div>
@@ -170,7 +177,7 @@ export function ClinicLayout({ children, activeTab = 'dashboard', onTabChange }:
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-foreground truncate">{user?.name}</p>
-                <p className="text-xs text-muted-foreground">Admin Clínica</p>
+                <p className="text-xs text-muted-foreground">{clinic.adminClinic}</p>
               </div>
               <button onClick={logout} className="text-muted-foreground hover:text-destructive transition-colors">
                 <LogOut className="w-5 h-5" />
@@ -184,20 +191,20 @@ export function ClinicLayout({ children, activeTab = 'dashboard', onTabChange }:
           {/* Desktop Header */}
           <header className="h-16 bg-card/50 border-b border-border items-center justify-between px-6 hidden md:flex">
             <h2 className="text-lg font-semibold text-foreground">
-              {navItems.find(item => item.id === activeTab)?.label || 'Dashboard'}
+              {navItems.find(item => item.id === activeTab)?.label || clinic.dashboard}
             </h2>
             <div className="flex items-center gap-2">
               <button 
                 onClick={toggleTheme}
                 className="p-2 rounded-lg hover:bg-accent transition-colors"
-                title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+                title={theme === 'dark' ? toggles.switchToLight : toggles.switchToDark}
               >
                 {theme === 'dark' ? <Sun className="w-5 h-5 text-muted-foreground" /> : <Moon className="w-5 h-5 text-muted-foreground" />}
               </button>
               <button 
                 onClick={toggleLanguage}
                 className="flex items-center gap-1.5 px-3 py-2 rounded-lg hover:bg-accent transition-colors text-sm"
-                title={language === 'es' ? 'Switch to English' : 'Cambiar a Español'}
+                title={language === 'es' ? toggles.switchToEnglish : toggles.switchToSpanish}
               >
                 <Globe className="w-4 h-4 text-muted-foreground" />
                 <span className="font-medium text-muted-foreground">{language.toUpperCase()}</span>

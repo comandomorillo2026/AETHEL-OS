@@ -1,8 +1,5 @@
 // WiPay Integration for Caribbean Payments
 // https://wipaycaribbean.com/
-// SERVER-SIDE FUNCTIONS ONLY
-
-import crypto from 'crypto';
 
 export interface WiPayConfig {
   accountId: string;
@@ -21,7 +18,6 @@ export interface WiPayPaymentRequest {
   orderId: string;
   returnUrl: string;
   cancelUrl: string;
-  // For subscriptions
   isRecurring?: boolean;
   recurringInterval?: 'monthly' | 'annual' | 'biannual';
 }
@@ -51,6 +47,15 @@ const WIPAY_URLS = {
   production: 'https://wipaycaribbean.com/v2',
 };
 
+// Generate signature for WiPay requests
+function generateWiPaySignature(apiKey: string, data: string): string {
+  const crypto = require('crypto');
+  return crypto
+    .createHmac('sha256', apiKey)
+    .update(data)
+    .digest('hex');
+}
+
 // Generate payment URL for WiPay redirect
 export function generateWiPayPaymentUrl(
   config: WiPayConfig,
@@ -58,7 +63,6 @@ export function generateWiPayPaymentUrl(
 ): string {
   const baseUrl = WIPAY_URLS[config.environment];
   
-  // Build query parameters
   const params = new URLSearchParams({
     account_number: config.accountId,
     amount: request.amount.toFixed(2),
@@ -73,25 +77,15 @@ export function generateWiPayPaymentUrl(
     environment: config.environment,
   });
 
-  // Add recurring parameters if subscription
   if (request.isRecurring && request.recurringInterval) {
     params.append('recurring', 'true');
     params.append('recurring_interval', request.recurringInterval);
   }
 
-  // Generate signature for security
   const signature = generateWiPaySignature(config.apiKey, params.toString());
   params.append('signature', signature);
 
   return `${baseUrl}/payment?${params.toString()}`;
-}
-
-// Generate signature for WiPay requests
-function generateWiPaySignature(apiKey: string, data: string): string {
-  return crypto
-    .createHmac('sha256', apiKey)
-    .update(data)
-    .digest('hex');
 }
 
 // Verify WiPay webhook signature
@@ -99,13 +93,8 @@ export function verifyWiPayWebhook(
   apiKey: string,
   payload: WiPayWebhookPayload
 ): boolean {
-  // Reconstruct the data string
   const data = `${payload.transaction_id}${payload.order_id}${payload.status}${payload.amount}${payload.currency}${payload.timestamp}`;
-  
-  // Calculate expected signature
   const expectedSignature = generateWiPaySignature(apiKey, data);
-  
-  // Compare signatures
   return payload.signature === expectedSignature;
 }
 
@@ -115,7 +104,6 @@ export function processWiPayResult(
 ): WiPayPaymentResponse {
   const status = queryParams.get('status');
   const transactionId = queryParams.get('transaction_id');
-  const orderId = queryParams.get('order_id');
   const error = queryParams.get('error');
 
   if (status === 'success' && transactionId) {
@@ -141,79 +129,31 @@ export function processWiPayResult(
   };
 }
 
-// Get WiPay configuration from environment
-export function getWiPayConfig(): WiPayConfig {
+// Calculate WiPay fees
+export function calculateWiPayFees(amount: number): {
+  platformFee: number;
+  processingFee: number;
+  totalFee: number;
+} {
+  // WiPay fees: 3.5% + TT$2.50 per transaction
+  const processingFee = amount * 0.035;
+  const platformFee = 2.50;
   return {
-    accountId: process.env.WIPAY_ACCOUNT_ID || '',
-    apiKey: process.env.WIPAY_API_KEY || '',
-    countryCode: 'TT',
-    environment: (process.env.WIPAY_ENVIRONMENT as 'sandbox' | 'production') || 'sandbox',
+    platformFee,
+    processingFee,
+    totalFee: processingFee + platformFee,
   };
 }
 
-// Check if WiPay is configured
-export function isWiPayConfigured(): boolean {
-  const config = getWiPayConfig();
-  return !!(config.accountId && config.apiKey);
-}
-
-// Calculate WiPay fees (3% + TT$1 per transaction)
-export function calculateWiPayFees(amount: number): { fee: number; total: number } {
-  const percentageFee = amount * 0.03; // 3%
-  const fixedFee = 1; // TT$1
-  const fee = Math.round((percentageFee + fixedFee) * 100) / 100;
-  const total = Math.round((amount + fee) * 100) / 100;
-  return { fee, total };
-}
-
-// Create a WiPay payment session
-export async function createWiPayPayment(params: {
-  amount: number;
-  description: string;
-  customerName: string;
-  customerEmail: string;
-  customerPhone: string;
-  orderId: string;
-}): Promise<{
-  status: 'success' | 'error';
-  transaction_id?: string;
-  url?: string;
-  error?: string;
-}> {
-  const config = getWiPayConfig();
-  
-  // Check if WiPay is configured
-  if (!config.accountId || !config.apiKey) {
-    return {
-      status: 'error',
-      error: 'WiPay no está configurado. Contacta al administrador.',
-    };
+// Create a WiPay payment (wrapper for generateWiPayPaymentUrl)
+export function createWiPayPayment(
+  config: WiPayConfig,
+  request: WiPayPaymentRequest
+): { success: boolean; paymentUrl?: string; error?: string } {
+  try {
+    const paymentUrl = generateWiPayPaymentUrl(config, request);
+    return { success: true, paymentUrl };
+  } catch (error) {
+    return { success: false, error: 'Failed to create payment' };
   }
-
-  // Generate return and cancel URLs
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://nexus-os-alpha.vercel.app';
-  const returnUrl = `${baseUrl}/checkout/success`;
-  const cancelUrl = `${baseUrl}/checkout/cancel`;
-
-  // Generate payment URL
-  const paymentUrl = generateWiPayPaymentUrl(config, {
-    amount: params.amount,
-    currency: 'TTD',
-    description: params.description,
-    customerName: params.customerName,
-    customerEmail: params.customerEmail,
-    customerPhone: params.customerPhone,
-    orderId: params.orderId,
-    returnUrl,
-    cancelUrl,
-  });
-
-  // Generate a transaction ID for tracking
-  const transactionId = `WIP-${Date.now()}-${Math.random().toString(36).substring(7)}`;
-
-  return {
-    status: 'success',
-    transaction_id: transactionId,
-    url: paymentUrl,
-  };
 }

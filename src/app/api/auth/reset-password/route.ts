@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { z } from 'zod';
 import bcrypt from 'bcryptjs';
+import { checkRateLimit } from '@/lib/rate-limit';
+import { authLogger, securityLogger } from '@/lib/logger';
 
 const resetPasswordSchema = z.object({
   token: z.string().min(1, 'Token requerido'),
@@ -9,6 +11,22 @@ const resetPasswordSchema = z.object({
 });
 
 export async function POST(request: NextRequest) {
+  // Apply rate limiting for auth endpoints
+  const rateLimitResult = checkRateLimit(request, 'auth');
+  if (!rateLimitResult.success) {
+    securityLogger.warn('Rate limit exceeded on reset-password endpoint', {
+      ip: request.headers.get('x-forwarded-for') || 'unknown',
+    });
+
+    return NextResponse.json(
+      {
+        error: rateLimitResult.message,
+        retryAfter: Math.ceil((rateLimitResult.reset.getTime() - Date.now()) / 1000),
+      },
+      { status: 429 }
+    );
+  }
+
   try {
     const body = await request.json();
     const { token, password } = resetPasswordSchema.parse(body);
@@ -27,6 +45,7 @@ export async function POST(request: NextRequest) {
     });
 
     if (!resetToken || !resetToken.user) {
+      securityLogger.warn('Invalid or expired reset token used', { tokenPrefix: token.substring(0, 8) });
       return NextResponse.json(
         { error: 'Token inválido o expirado. Solicita un nuevo enlace de restablecimiento.' },
         { status: 400 }
@@ -64,17 +83,24 @@ export async function POST(request: NextRequest) {
         },
       });
     } catch (logError) {
-      console.log('[RESET_PASSWORD] Could not log activity:', logError);
+      authLogger.error('Could not log password reset activity', logError);
     }
 
-    console.log('[RESET_PASSWORD] Password reset successful for:', resetToken.user.email);
+    authLogger.info('Password reset successful', {
+      userId: resetToken.user.id,
+      email: resetToken.user.email
+    });
 
-    return NextResponse.json({ 
+    securityLogger.info('Password changed via reset token', 'medium', {
+      userId: resetToken.user.id,
+    });
+
+    return NextResponse.json({
       success: true,
       message: 'Contraseña actualizada exitosamente'
     });
   } catch (error) {
-    console.error('[RESET_PASSWORD_ERROR]', error);
+    authLogger.error('Reset password error', error);
 
     if (error instanceof z.ZodError) {
       return NextResponse.json(
@@ -121,7 +147,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ valid: true });
   } catch (error) {
-    console.error('[RESET_PASSWORD_VALIDATE_ERROR]', error);
+    authLogger.error('Token validation error', error);
     return NextResponse.json(
       { valid: false, error: 'Error validando token' },
       { status: 500 }

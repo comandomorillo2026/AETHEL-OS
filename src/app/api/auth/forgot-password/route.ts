@@ -2,11 +2,30 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { randomBytes } from 'crypto';
 import { sendEmail } from '@/lib/email/resend';
+import { checkRateLimit } from '@/lib/rate-limit';
+import { authLogger, securityLogger, emailLogger } from '@/lib/logger';
 
 // Token expires in 1 hour
 const TOKEN_EXPIRY_MS = 60 * 60 * 1000;
 
 export async function POST(request: NextRequest) {
+  // Apply rate limiting for auth endpoints
+  const rateLimitResult = checkRateLimit(request, 'auth');
+  if (!rateLimitResult.success) {
+    securityLogger.warn('Rate limit exceeded on forgot-password endpoint', {
+      ip: request.headers.get('x-forwarded-for') || 'unknown',
+    });
+
+    return NextResponse.json(
+      {
+        success: true, // Still return success to prevent enumeration
+        message: 'Si el email existe, recibirás instrucciones',
+        retryAfter: Math.ceil((rateLimitResult.reset.getTime() - Date.now()) / 1000),
+      },
+      { status: 429 }
+    );
+  }
+
   try {
     const body = await request.json();
     const { email } = body;
@@ -14,6 +33,8 @@ export async function POST(request: NextRequest) {
     if (!email) {
       return NextResponse.json({ error: 'Email requerido' }, { status: 400 });
     }
+
+    authLogger.info('Password reset requested', { email });
 
     // Find user by email
     const user = await db.systemUser.findUnique({
@@ -23,10 +44,10 @@ export async function POST(request: NextRequest) {
     // IMPORTANT: Always return success to prevent email enumeration
     // Even if user doesn't exist, we don't reveal it
     if (!user) {
-      console.log('[FORGOT_PASSWORD] User not found:', email);
-      return NextResponse.json({ 
-        success: true, 
-        message: 'Si el email existe, recibirás instrucciones' 
+      securityLogger.info('Password reset requested for non-existent email', { email });
+      return NextResponse.json({
+        success: true,
+        message: 'Si el email existe, recibirás instrucciones'
       });
     }
 
@@ -66,23 +87,25 @@ export async function POST(request: NextRequest) {
       html
     });
 
-    if (!result.success) {
-      console.error('[FORGOT_PASSWORD] Failed to send email:', result.error);
-      // Still return success to prevent enumeration
+    if (result.success) {
+      emailLogger.info('Password reset email sent', { to: email });
+    } else {
+      emailLogger.error('Failed to send password reset email', result.error, { to: email });
     }
 
-    console.log('[FORGOT_PASSWORD] Reset email sent to:', email);
+    authLogger.info('Password reset token created', { userId: user.id, email });
 
-    return NextResponse.json({ 
-      success: true, 
-      message: 'Si el email existe, recibirás instrucciones' 
+    return NextResponse.json({
+      success: true,
+      message: 'Si el email existe, recibirás instrucciones'
     });
 
   } catch (error) {
-    console.error('[FORGOT_PASSWORD] Error:', error);
-    return NextResponse.json({ 
-      success: true, // Still return success to prevent enumeration
-      message: 'Si el email existe, recibirás instrucciones' 
+    authLogger.error('Forgot password error', error);
+    // Still return success to prevent enumeration
+    return NextResponse.json({
+      success: true,
+      message: 'Si el email existe, recibirás instrucciones'
     });
   }
 }

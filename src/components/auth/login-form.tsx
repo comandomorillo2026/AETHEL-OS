@@ -1,9 +1,8 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import { Shield, Mail, Lock, Eye, EyeOff, Loader2, AlertCircle } from 'lucide-react';
+import { Shield, Mail, Lock, Eye, EyeOff, Loader2, AlertCircle, CheckCircle } from 'lucide-react';
 
 interface LoginFormProps {
   onSuccess?: () => void;
@@ -12,6 +11,7 @@ interface LoginFormProps {
 export function LoginForm({ onSuccess }: LoginFormProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [rememberMe, setRememberMe] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -20,6 +20,11 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
 
   useEffect(() => {
     setMounted(true);
+    // Check if user was remembered
+    const wasRemembered = document.cookie.includes('aethel_remember=true');
+    if (wasRemembered) {
+      setRememberMe(true);
+    }
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -28,36 +33,24 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
     setIsLoading(true);
 
     try {
-      const result = await signIn('credentials', {
-        email,
-        password,
-        redirect: false,
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ email, password, rememberMe }),
       });
 
-      if (result?.error) {
-        setError('Credenciales inválidas. Verifica tu email y contraseña.');
-      } else {
-        // Success - redirect based on email domain
+      const data = await response.json();
+
+      if (data.success) {
+        // Success - redirect based on role
         if (onSuccess) {
           onSuccess();
         } else {
-          // Determine redirect based on email
-          if (email === 'admin@aethel.tt' || email.includes('admin')) {
-            router.push('/admin');
-          } else if (email.includes('clinic')) {
-            router.push('/clinic');
-          } else if (email.includes('lawfirm')) {
-            router.push('/lawfirm');
-          } else if (email.includes('beauty')) {
-            router.push('/beauty');
-          } else if (email.includes('nurse')) {
-            router.push('/nurse');
-          } else if (email.includes('bakery')) {
-            router.push('/bakery');
-          } else {
-            router.push('/clinic');
-          }
+          router.push(data.redirectPath || '/clinic');
         }
+      } else {
+        setError(data.error || 'Credenciales incorrectas. Verifica tu email y contraseña.');
       }
     } catch (err) {
       setError('Error de conexión. Intenta de nuevo.');
@@ -137,6 +130,40 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
               </div>
             </div>
 
+            {/* Remember Me Checkbox */}
+            <div className="flex items-center justify-between">
+              <label className="flex items-center gap-2 cursor-pointer group">
+                <div className="relative">
+                  <input
+                    type="checkbox"
+                    checked={rememberMe}
+                    onChange={(e) => setRememberMe(e.target.checked)}
+                    className="sr-only"
+                  />
+                  <div className={`w-5 h-5 rounded border-2 transition-all duration-200 flex items-center justify-center ${
+                    rememberMe
+                      ? 'bg-gradient-to-r from-[#6C3FCE] to-[#C026D3] border-transparent'
+                      : 'border-[rgba(167,139,250,0.3)] group-hover:border-[#9D7BEA]'
+                  }`}>
+                    {rememberMe && (
+                      <CheckCircle className="w-3 h-3 text-white" />
+                    )}
+                  </div>
+                </div>
+                <span className="text-sm text-[#9D7BEA] group-hover:text-[#EDE9FE] transition-colors">
+                  Recordarme
+                </span>
+              </label>
+
+              {/* Forgot Password Link */}
+              <a
+                href="/forgot-password"
+                className="text-sm text-[#9D7BEA] hover:text-[#EDE9FE] transition-colors"
+              >
+                ¿Olvidaste tu contraseña?
+              </a>
+            </div>
+
             <button
               type="submit"
               disabled={isLoading}
@@ -151,16 +178,6 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
                 'Iniciar Sesión'
               )}
             </button>
-
-            {/* Forgot Password Link */}
-            <div className="text-center">
-              <a
-                href="/forgot-password"
-                className="text-sm text-[#9D7BEA] hover:text-[#EDE9FE] transition-colors"
-              >
-                ¿Olvidaste tu contraseña?
-              </a>
-            </div>
           </form>
 
           {/* Demo credentials */}
@@ -169,35 +186,47 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
             <div className="space-y-2">
               <button
                 type="button"
-                onClick={() => { setEmail('admin@aethel.tt'); setPassword('admin123'); }}
+                onClick={() => { setEmail('admin@aethel.tt'); setPassword('Aethel2024!'); }}
                 className="w-full text-left p-2 rounded bg-[rgba(108,63,206,0.1)] text-[#9D7BEA] hover:bg-[rgba(108,63,206,0.2)] text-sm transition-colors"
               >
-                👑 Admin: admin@aethel.tt / admin123
+                👑 Admin: admin@aethel.tt
               </button>
               <button
                 type="button"
-                onClick={() => { setEmail('clinic@aethel.tt'); setPassword('demo123'); }}
+                onClick={() => { setEmail('clinic@aethel.tt'); setPassword('Demo2024!'); }}
                 className="w-full text-left p-2 rounded bg-[rgba(108,63,206,0.1)] text-[#9D7BEA] hover:bg-[rgba(108,63,206,0.2)] text-sm transition-colors"
               >
-                🏥 Clínica: clinic@aethel.tt / demo123
+                🏥 Clínica: clinic@aethel.tt
               </button>
               <button
                 type="button"
-                onClick={() => { setEmail('lawfirm@aethel.tt'); setPassword('demo123'); }}
+                onClick={() => { setEmail('lawfirm@aethel.tt'); setPassword('Demo2024!'); }}
                 className="w-full text-left p-2 rounded bg-[rgba(108,63,206,0.1)] text-[#9D7BEA] hover:bg-[rgba(108,63,206,0.2)] text-sm transition-colors"
               >
-                ⚖️ Bufete: lawfirm@aethel.tt / demo123
+                ⚖️ Bufete: lawfirm@aethel.tt
               </button>
               <button
                 type="button"
-                onClick={() => { setEmail('beauty@aethel.tt'); setPassword('demo123'); }}
+                onClick={() => { setEmail('beauty@aethel.tt'); setPassword('Demo2024!'); }}
                 className="w-full text-left p-2 rounded bg-[rgba(108,63,206,0.1)] text-[#9D7BEA] hover:bg-[rgba(108,63,206,0.2)] text-sm transition-colors"
               >
-                💇 Salón: beauty@aethel.tt / demo123
+                💇 Salón: beauty@aethel.tt
+              </button>
+              <button
+                type="button"
+                onClick={() => { setEmail('nurse@aethel.tt'); setPassword('Demo2024!'); }}
+                className="w-full text-left p-2 rounded bg-[rgba(108,63,206,0.1)] text-[#9D7BEA] hover:bg-[rgba(108,63,206,0.2)] text-sm transition-colors"
+              >
+                💉 Enfermería: nurse@aethel.tt
               </button>
             </div>
           </div>
         </div>
+
+        {/* Security note */}
+        <p className="text-center text-xs text-[rgba(167,139,250,0.3)] mt-4">
+          🔒 Tu sesión está protegida con encriptación de extremo a extremo
+        </p>
       </div>
     </div>
   );

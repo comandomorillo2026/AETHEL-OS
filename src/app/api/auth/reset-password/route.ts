@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
+import { db } from '@/lib/db';
 import { z } from 'zod';
 import bcrypt from 'bcryptjs';
 
@@ -13,19 +13,22 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { token, password } = resetPasswordSchema.parse(body);
 
-    // Find user with valid reset token
-    const user = await prisma.systemUser.findFirst({
+    // Find valid reset token
+    const resetToken = await db.passwordResetToken.findFirst({
       where: {
-        resetToken: token,
-        resetTokenExpires: {
+        token,
+        expiresAt: {
           gte: new Date().toISOString(),
         },
       },
+      include: {
+        user: true,
+      },
     });
 
-    if (!user) {
+    if (!resetToken || !resetToken.user) {
       return NextResponse.json(
-        { error: 'Token inválido o expirado' },
+        { error: 'Token inválido o expirado. Solicita un nuevo enlace de restablecimiento.' },
         { status: 400 }
       );
     }
@@ -34,30 +37,42 @@ export async function POST(request: NextRequest) {
     const saltRounds = 12;
     const passwordHash = await bcrypt.hash(password, saltRounds);
 
-    // Update user password and clear reset token
-    await prisma.systemUser.update({
-      where: { id: user.id },
+    // Update user password
+    await db.systemUser.update({
+      where: { id: resetToken.userId },
       data: {
         passwordHash,
-        resetToken: null,
-        resetTokenExpires: null,
       },
+    });
+
+    // Delete all reset tokens for this user
+    await db.passwordResetToken.deleteMany({
+      where: { userId: resetToken.userId },
     });
 
     // Log activity
-    await prisma.activityLog.create({
-      data: {
-        userId: user.id,
-        userEmail: user.email,
-        userName: user.name,
-        action: 'update',
-        entityType: 'user',
-        entityId: user.id,
-        description: 'Contraseña actualizada via reset',
-      },
-    });
+    try {
+      await db.activityLog.create({
+        data: {
+          userId: resetToken.user.id,
+          userEmail: resetToken.user.email,
+          userName: resetToken.user.name,
+          action: 'update',
+          entityType: 'user',
+          entityId: resetToken.user.id,
+          description: 'Contraseña actualizada via reset',
+        },
+      });
+    } catch (logError) {
+      console.log('[RESET_PASSWORD] Could not log activity:', logError);
+    }
 
-    return NextResponse.json({ success: true });
+    console.log('[RESET_PASSWORD] Password reset successful for:', resetToken.user.email);
+
+    return NextResponse.json({ 
+      success: true,
+      message: 'Contraseña actualizada exitosamente'
+    });
   } catch (error) {
     console.error('[RESET_PASSWORD_ERROR]', error);
 
@@ -70,6 +85,45 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(
       { error: 'Error al restablecer contraseña' },
+      { status: 500 }
+    );
+  }
+}
+
+// GET: Validate token without resetting
+export async function GET(request: NextRequest) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const token = searchParams.get('token');
+
+    if (!token) {
+      return NextResponse.json(
+        { valid: false, error: 'Token requerido' },
+        { status: 400 }
+      );
+    }
+
+    const resetToken = await db.passwordResetToken.findFirst({
+      where: {
+        token,
+        expiresAt: {
+          gte: new Date().toISOString(),
+        },
+      },
+    });
+
+    if (!resetToken) {
+      return NextResponse.json(
+        { valid: false, error: 'Token inválido o expirado' },
+        { status: 400 }
+      );
+    }
+
+    return NextResponse.json({ valid: true });
+  } catch (error) {
+    console.error('[RESET_PASSWORD_VALIDATE_ERROR]', error);
+    return NextResponse.json(
+      { valid: false, error: 'Error validando token' },
       { status: 500 }
     );
   }

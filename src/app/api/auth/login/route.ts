@@ -1,13 +1,17 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import bcrypt from 'bcryptjs';
+import { randomBytes } from 'crypto';
+
+const SESSION_DURATION_DAYS = 30;
+const TEMP_SESSION_DURATION_HOURS = 4;
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { email, password } = body;
+    const { email, password, rememberMe = false } = body;
 
-    console.log('[AUTH] Login attempt for:', email);
+    console.log('[AUTH] Login attempt for:', email, '| Remember me:', rememberMe);
 
     if (!email || !password) {
       return NextResponse.json({ 
@@ -72,9 +76,15 @@ export async function POST(request: Request) {
       redirectPath = `/${user.tenant.slug}`;
     }
 
+    // Create session token
+    const sessionToken = randomBytes(32).toString('hex');
+    const cookieMaxAge = rememberMe
+      ? SESSION_DURATION_DAYS * 24 * 60 * 60  // 30 days in seconds
+      : TEMP_SESSION_DURATION_HOURS * 60 * 60; // 4 hours in seconds
+
     console.log('[AUTH] Login successful for:', user.email, '- Redirecting to:', redirectPath);
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       success: true,
       user: {
         id: user.id,
@@ -87,7 +97,39 @@ export async function POST(request: Request) {
         industrySlug: user.tenant?.industrySlug || null,
       },
       redirectPath,
+      sessionCreated: true,
     });
+
+    // Set HTTP-only session cookie
+    response.cookies.set('aethel_session', sessionToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: cookieMaxAge,
+      path: '/',
+    });
+
+    // Set user ID cookie for quick validation
+    response.cookies.set('aethel_user_id', user.id, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: cookieMaxAge,
+      path: '/',
+    });
+
+    // Set remember me flag (accessible to frontend)
+    if (rememberMe) {
+      response.cookies.set('aethel_remember', 'true', {
+        httpOnly: false,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: cookieMaxAge,
+        path: '/',
+      });
+    }
+
+    return response;
   } catch (error) {
     console.error('[AUTH] Error:', error);
     return NextResponse.json({

@@ -1,15 +1,16 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 
-// Security: Only allow in development or with proper authentication
+// Security: Block in production unless authenticated
 function isAllowed(request: Request): boolean {
+  // Block all requests in production unless they have the secret
+  if (process.env.NODE_ENV === 'production' || process.env.VERCEL) {
+    const authHeader = request.headers.get('x-debug-secret');
+    const expectedSecret = process.env.DEBUG_SECRET || 'aethel-debug-2024';
+    return authHeader === expectedSecret;
+  }
   // Allow in development
-  if (process.env.NODE_ENV === 'development') return true;
-
-  // In production, require a secret header
-  const authHeader = request.headers.get('x-debug-secret');
-  const expectedSecret = process.env.DEBUG_SECRET || 'aethel-debug-2024';
-  return authHeader === expectedSecret;
+  return true;
 }
 
 export async function GET(request: Request) {

@@ -2,15 +2,16 @@ import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import bcrypt from 'bcryptjs';
 
-// Security: Only allow in development or with proper authentication
+// Security: Block in production unless authenticated
 function isAllowed(request: Request): boolean {
+  // Block all requests in production unless they have the secret
+  if (process.env.NODE_ENV === 'production' || process.env.VERCEL) {
+    const authHeader = request.headers.get('x-diagnostic-secret');
+    const expectedSecret = process.env.DIAGNOSTIC_SECRET || 'aethel-diagnostic-2024';
+    return authHeader === expectedSecret;
+  }
   // Allow in development
-  if (process.env.NODE_ENV === 'development') return true;
-
-  // In production, require a secret header
-  const authHeader = request.headers.get('x-diagnostic-secret');
-  const expectedSecret = process.env.DIAGNOSTIC_SECRET || 'aethel-diagnostic-2024';
-  return authHeader === expectedSecret;
+  return true;
 }
 
 export async function GET(request: Request) {

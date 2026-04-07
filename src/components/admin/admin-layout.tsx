@@ -25,6 +25,7 @@ import {
   Sun,
   Moon,
   Database,
+  Radio,
 } from 'lucide-react';
 
 interface AdminLayoutProps {
@@ -39,6 +40,7 @@ export function AdminLayout({ children, activeTab = 'dashboard' }: AdminLayoutPr
 
   const navItems = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { id: 'control-tower', label: 'Torre de Control', icon: Radio },
     { id: 'orders', label: 'Órdenes', icon: CreditCard },
     { id: 'tenants', label: 'Inquilinos', icon: Building2 },
     { id: 'industries', label: 'Industrias', icon: Globe },
@@ -96,7 +98,7 @@ export function AdminLayout({ children, activeTab = 'dashboard' }: AdminLayoutPr
           <div className="mb-4">
             <p className="text-xs font-medium text-muted-foreground uppercase px-3 mb-2">Principal</p>
             <ul className="space-y-1">
-              {navItems.slice(0, 5).map((item) => (
+              {navItems.slice(0, 6).map((item) => (
                 <li key={item.id}>
                   <button
                     onClick={() => {
@@ -122,7 +124,7 @@ export function AdminLayout({ children, activeTab = 'dashboard' }: AdminLayoutPr
           <div>
             <p className="text-xs font-medium text-muted-foreground uppercase px-3 mb-2">Configuración</p>
             <ul className="space-y-1">
-              {navItems.slice(5).map((item) => (
+              {navItems.slice(6).map((item) => (
                 <li key={item.id}>
                   <button
                     onClick={() => {

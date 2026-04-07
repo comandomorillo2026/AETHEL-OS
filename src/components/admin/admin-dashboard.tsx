@@ -64,6 +64,7 @@ import { AIAssistant, AIAssistantButton } from './ai-assistant';
 import { ScalabilityPlan } from './scalability-plan';
 import { CompetitiveAnalysis } from './competitive-analysis';
 import { DatabaseMonitor } from './database-monitor';
+import { ControlTower } from './control-tower';
 
 // ============================================
 // STAT CARD COMPONENT
@@ -1074,6 +1075,8 @@ export function AdminDashboard() {
         return <ScalabilityPlan />;
       case 'database':
         return <DatabaseMonitor />;
+      case 'control-tower':
+        return <ControlTower />;
       case 'users':
         return <UsersManagement />;
       case 'pricing':

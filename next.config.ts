@@ -1,12 +1,8 @@
 import type { NextConfig } from "next";
+import { withSentryConfig } from "@sentry/nextjs";
 
 // ============================================================================
-// NEXUSOS - CONFIGURACIÓN DE PRODUCCIÓN
-// ============================================================================
-// 
-// NOTA: Los errores de TypeScript/ESLint están temporalmente ignorados.
-// PRIORIDAD ALTA: Resolver todos los errores y remover estas configuraciones.
-// Ver: /download/NexusOS_Evaluacion_Produccion.md para lista completa.
+// AETHEL OS - CONFIGURACIÓN DE PRODUCCIÓN
 // ============================================================================
 
 const nextConfig: NextConfig = {
@@ -15,10 +11,10 @@ const nextConfig: NextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
-  
+
   // Habilitar Strict Mode para React
   reactStrictMode: true,
-  
+
   // Configuración de imágenes
   images: {
     remotePatterns: [
@@ -40,7 +36,7 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  
+
   // Headers de seguridad
   async headers() {
     return [
@@ -90,15 +86,48 @@ const nextConfig: NextConfig = {
       },
     ];
   },
-  
+
   // Powered-by header removido por seguridad
   poweredByHeader: false,
-  
+
   // Compresión habilitada
   compress: true,
-  
+
   // Generar ETags para cache
   generateEtags: true,
 };
 
-export default nextConfig;
+// Sentry configuration
+const sentryConfig = {
+  // Silent logging in production
+  silent: process.env.NODE_ENV === 'production',
+
+  // Source maps upload configuration
+  org: 'aethel-os',
+  project: 'aethel-os',
+
+  // widen the file trace for troubleshooting
+  widenClientFileUpload: true,
+
+  // Automatically annotate React components to show their full name in breadcrumbs
+  reactComponentAnnotation: {
+    enabled: true,
+  },
+
+  // Route browser requests to Sentry through a Next.js rewrite to circumvent ad-blockers
+  tunnelRoute: '/monitoring',
+
+  // Hide source maps from generated client bundles
+  hideSourceMaps: true,
+
+  // Automatically tree-shake Sentry logger statements to reduce bundle size
+  disableLogger: true,
+
+  // Enables automatic instrumentation of Vercel Cron Monitors
+  automaticVercelMonitors: true,
+};
+
+// Export with Sentry wrapper if DSN is configured
+export default process.env.NEXT_PUBLIC_SENTRY_DSN
+  ? withSentryConfig(nextConfig, sentryConfig)
+  : nextConfig;

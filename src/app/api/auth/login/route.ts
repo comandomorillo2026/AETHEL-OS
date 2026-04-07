@@ -53,16 +53,6 @@ export async function POST(request: NextRequest) {
     // Find user in database
     const user = await db.systemUser.findUnique({
       where: { email: email.toLowerCase() },
-      include: {
-        tenant: {
-          select: {
-            id: true,
-            slug: true,
-            businessName: true,
-            industrySlug: true,
-          }
-        }
-      }
     });
 
     if (!user) {
@@ -92,6 +82,24 @@ export async function POST(request: NextRequest) {
       }, { status: 401 });
     }
 
+    // Get tenant info if user has a tenantId
+    let tenant = null;
+    if (user.tenantId) {
+      try {
+        tenant = await db.tenant.findUnique({
+          where: { id: user.tenantId },
+          select: {
+            id: true,
+            slug: true,
+            businessName: true,
+            industrySlug: true,
+          }
+        });
+      } catch (e) {
+        authLogger.warn('Could not fetch tenant info', { tenantId: user.tenantId });
+      }
+    }
+
     // Update last login
     await db.systemUser.update({
       where: { id: user.id },
@@ -102,8 +110,8 @@ export async function POST(request: NextRequest) {
     let redirectPath = '/clinic'; // default
     if (user.role === 'SUPER_ADMIN' || user.role === 'ADMIN') {
       redirectPath = '/admin';
-    } else if (user.tenant?.slug) {
-      redirectPath = `/${user.tenant.slug}`;
+    } else if (tenant?.slug) {
+      redirectPath = `/${tenant.slug}`;
     }
 
     // Create session token
@@ -129,9 +137,9 @@ export async function POST(request: NextRequest) {
         name: user.name,
         role: user.role,
         tenantId: user.tenantId,
-        tenantSlug: user.tenant?.slug || null,
-        tenantName: user.tenant?.businessName || null,
-        industrySlug: user.tenant?.industrySlug || null,
+        tenantSlug: tenant?.slug || null,
+        tenantName: tenant?.businessName || null,
+        industrySlug: tenant?.industrySlug || null,
       },
       redirectPath,
       sessionCreated: true,

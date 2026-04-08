@@ -37,6 +37,7 @@ interface ControlTowerMetrics {
     storageLimitMB: number;
     storagePercentage: number;
     activeConnections: number;
+    idleConnections: number;
     maxConnections: number;
     connectionPercentage: number;
     totalTables: number;

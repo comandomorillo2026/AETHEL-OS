@@ -22,6 +22,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { PRICING, TAX_RATE, generateInvoiceNumber, formatCurrency, type Tenant, type Invoice } from '@/lib/admin-types';
+import { getIndustryPricing, formatTTD, type IndustryPricing } from '@/lib/industry-pricing';
 
 interface CreateTenantWizardProps {
   onClose: () => void;
@@ -85,9 +86,40 @@ export function CreateTenantWizard({ onClose, onSuccess, nextTenantNumber }: Cre
     { value: 'PREMIUM', label: 'Premium', users: '6+ usuarios' },
   ];
 
+  // Get industry-specific pricing
+  const getIndustryPricingData = (): IndustryPricing | undefined => {
+    return getIndustryPricing(formData.industry);
+  };
+
   const getPlanPrice = (plan: string, cycle: string) => {
+    const industryPricing = getIndustryPricingData();
+    const planKey = plan.toLowerCase() as 'starter' | 'growth' | 'premium';
+    
+    if (industryPricing && industryPricing.plans[planKey]) {
+      return cycle === 'annual' 
+        ? industryPricing.plans[planKey].priceAnnual 
+        : industryPricing.plans[planKey].price;
+    }
+    
+    // Fallback to default pricing
     const pricing = PRICING[plan as keyof typeof PRICING];
     return cycle === 'annual' ? pricing.annual : pricing.monthly;
+  };
+
+  const getPlanDetails = (plan: string) => {
+    const industryPricing = getIndustryPricingData();
+    const planKey = plan.toLowerCase() as 'starter' | 'growth' | 'premium';
+    
+    if (industryPricing && industryPricing.plans[planKey]) {
+      const planData = industryPricing.plans[planKey];
+      return {
+        users: planData.users,
+        branches: planData.branches,
+        employees: planData.employees
+      };
+    }
+    
+    return { users: 5, branches: 1, employees: '' };
   };
 
   const calculateTotals = () => {

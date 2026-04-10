@@ -163,6 +163,27 @@ export async function POST(request: NextRequest) {
       path: '/',
     });
 
+    // Set nexus_token cookie for middleware authentication
+    // This contains user info encoded in base64 for the middleware to read
+    const tokenData = {
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      role: user.role,
+      tenantId: user.tenantId,
+      tenantSlug: tenant?.slug || null,
+      industrySlug: tenant?.industrySlug || null,
+      tenantStatus: 'active',
+      isTrial: false,
+    };
+    response.cookies.set('nexus_token', Buffer.from(JSON.stringify(tokenData)).toString('base64'), {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: cookieMaxAge,
+      path: '/',
+    });
+
     // Set remember me flag (accessible to frontend)
     if (rememberMe) {
       response.cookies.set('aethel_remember', 'true', {

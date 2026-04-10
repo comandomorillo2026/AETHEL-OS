@@ -7,3 +7,6 @@ export { CondoCard } from './CondoCard';
 export { EmptyState } from './EmptyState';
 export { LoadingSpinner } from './LoadingSpinner';
 export { ConfirmDialog } from './ConfirmDialog';
+
+// Aliases for backward compatibility
+export { LoadingSpinner as PageLoader } from './LoadingSpinner';

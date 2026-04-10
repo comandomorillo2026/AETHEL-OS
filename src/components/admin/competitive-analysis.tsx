@@ -442,12 +442,12 @@ function QuickFactCard({ fact }: { fact: { label: string; value: string; highlig
   );
 }
 
-function PriceBar({ name, price, features, color, isAETHEL OS }: { 
+function PriceBar({ name, price, features, color, isAETHELOS }: { 
   name: string; 
   price: string; 
   features: number; 
   color: string;
-  isAETHEL OS: boolean;
+  isAETHELOS: boolean;
 }) {
   // Parse price for bar width (rough comparison)
   const getPriceValue = (p: string) => {
@@ -460,13 +460,13 @@ function PriceBar({ name, price, features, color, isAETHEL OS }: {
   const width = Math.max(15, (priceValue / maxPrice) * 100);
 
   return (
-    <div className={`p-4 rounded-xl ${isAETHEL OS ? 'bg-[rgba(240,180,41,0.1)] border border-[#F0B429]/30' : 'bg-[rgba(108,63,206,0.05)] border border-[rgba(167,139,250,0.1)]'}`}>
+    <div className={`p-4 rounded-xl ${isAETHELOS ? 'bg-[rgba(240,180,41,0.1)] border border-[#F0B429]/30' : 'bg-[rgba(108,63,206,0.05)] border border-[rgba(167,139,250,0.1)]'}`}>
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-2">
-          {isAETHEL OS && <Award className="w-4 h-4 text-[#F0B429]" />}
-          <span className={`font-semibold ${isAETHEL OS ? 'text-[#F0B429]' : 'text-[#EDE9FE]'}`}>{name}</span>
+          {isAETHELOS && <Award className="w-4 h-4 text-[#F0B429]" />}
+          <span className={`font-semibold ${isAETHELOS ? 'text-[#F0B429]' : 'text-[#EDE9FE]'}`}>{name}</span>
         </div>
-        <span className={`font-mono text-lg font-bold ${isAETHEL OS ? 'text-[#F0B429]' : 'text-[#EDE9FE]'}`}>
+        <span className={`font-mono text-lg font-bold ${isAETHELOS ? 'text-[#F0B429]' : 'text-[#EDE9FE]'}`}>
           {price}
         </span>
       </div>
@@ -478,7 +478,7 @@ function PriceBar({ name, price, features, color, isAETHEL OS }: {
       </div>
       <div className="flex justify-between mt-2">
         <span className="text-xs text-[#9D7BEA]">{features} features clave</span>
-        {isAETHEL OS && (
+        {isAETHELOS && (
           <span className="text-xs text-[#34D399]">Mejor valor</span>
         )}
       </div>
@@ -693,7 +693,7 @@ export function CompetitiveAnalysis() {
             <PriceBar 
               key={index} 
               {...item} 
-              isAETHEL OS={item.name === 'AETHEL OS'}
+              isAETHELOS={item.name === 'AETHEL OS'}
             />
           ))}
         </div>

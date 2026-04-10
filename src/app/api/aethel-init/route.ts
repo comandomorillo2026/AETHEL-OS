@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import bcrypt from 'bcryptjs';
-import { randomUUID } from 'crypto';
 
 // Simple endpoint to initialize AETHEL OS users
 // Call this endpoint directly in production to create the admin user
@@ -60,8 +59,13 @@ export async function POST(request: NextRequest) {
         where: { slug: industry.slug },
         update: {},
         create: {
-          id: randomUUID(),
-          ...industry,
+          slug: industry.slug,
+          nameEn: industry.nameEn,
+          nameEs: industry.nameEs,
+          icon: industry.icon,
+          descriptionEn: industry.descriptionEn,
+          descriptionEs: industry.descriptionEs,
+          sortOrder: industry.sortOrder,
           status: 'active',
         },
       });
@@ -71,9 +75,9 @@ export async function POST(request: NextRequest) {
 
     // Create plans if they don't exist
     const plans = [
-      { slug: 'starter', nameEn: 'Starter', nameEs: 'Inicial', tier: 'starter', priceMonthlyTtd: 340, maxUsers: 3, maxBranches: 1 },
-      { slug: 'growth', nameEn: 'Growth', nameEs: 'Crecimiento', tier: 'growth', priceMonthlyTtd: 595, maxUsers: 10, maxBranches: 3 },
-      { slug: 'premium', nameEn: 'Premium', nameEs: 'Premium', tier: 'premium', priceMonthlyTtd: 850, maxUsers: 50, maxBranches: 10 },
+      { slug: 'starter', nameEn: 'Starter', nameEs: 'Inicial', tier: 'starter', priceMonthlyTtd: 340, priceAnnualTtd: 306, priceBiannualTtd: 578, maxUsers: 3, maxBranches: 1 },
+      { slug: 'growth', nameEn: 'Growth', nameEs: 'Crecimiento', tier: 'growth', priceMonthlyTtd: 595, priceAnnualTtd: 536, priceBiannualTtd: 1012, maxUsers: 10, maxBranches: 3 },
+      { slug: 'premium', nameEn: 'Premium', nameEs: 'Premium', tier: 'premium', priceMonthlyTtd: 850, priceAnnualTtd: 765, priceBiannualTtd: 1445, maxUsers: 50, maxBranches: 10 },
     ];
 
     for (const plan of plans) {
@@ -81,10 +85,15 @@ export async function POST(request: NextRequest) {
         where: { slug: plan.slug },
         update: {},
         create: {
-          id: randomUUID(),
-          ...plan,
-          featuresEn: JSON.stringify([]),
-          featuresEs: JSON.stringify([]),
+          slug: plan.slug,
+          nameEn: plan.nameEn,
+          nameEs: plan.nameEs,
+          tier: plan.tier,
+          priceMonthlyTtd: plan.priceMonthlyTtd,
+          priceAnnualTtd: plan.priceAnnualTtd,
+          priceBiannualTtd: plan.priceBiannualTtd,
+          maxUsers: plan.maxUsers,
+          maxBranches: plan.maxBranches,
         },
       });
     }
@@ -94,7 +103,6 @@ export async function POST(request: NextRequest) {
     // Create SUPER_ADMIN user
     const superAdmin = await prisma.systemUser.create({
       data: {
-        id: randomUUID(),
         email: 'admin@aethel.tt',
         name: 'AETHEL Administrator',
         passwordHash: adminPasswordHash,
@@ -114,7 +122,6 @@ export async function POST(request: NextRequest) {
     try {
       const clinicTenant = await prisma.tenant.create({
         data: {
-          id: randomUUID(),
           slug: 'clinica-demo',
           businessName: 'Clínica San Fernando',
           legalName: 'Clínica San Fernando S.A.',
@@ -133,7 +140,6 @@ export async function POST(request: NextRequest) {
 
       await prisma.systemUser.create({
         data: {
-          id: randomUUID(),
           email: 'clinic@aethel.tt',
           name: 'Dr. Juan Martínez',
           passwordHash: demoPasswordHash,
@@ -151,7 +157,6 @@ export async function POST(request: NextRequest) {
     try {
       const lawfirmTenant = await prisma.tenant.create({
         data: {
-          id: randomUUID(),
           slug: 'bufete-perez',
           businessName: 'Bufete Pérez & Asociados',
           legalName: 'Bufete Pérez & Asociados',
@@ -170,7 +175,6 @@ export async function POST(request: NextRequest) {
 
       await prisma.systemUser.create({
         data: {
-          id: randomUUID(),
           email: 'lawfirm@aethel.tt',
           name: 'Carlos Pérez',
           passwordHash: demoPasswordHash,
@@ -188,7 +192,6 @@ export async function POST(request: NextRequest) {
     try {
       const beautyTenant = await prisma.tenant.create({
         data: {
-          id: randomUUID(),
           slug: 'salon-bella-vista',
           businessName: 'Salón Bella Vista',
           legalName: 'Salón Bella Vista',
@@ -207,7 +210,6 @@ export async function POST(request: NextRequest) {
 
       await prisma.systemUser.create({
         data: {
-          id: randomUUID(),
           email: 'beauty@aethel.tt',
           name: 'Ana Gómez',
           passwordHash: demoPasswordHash,
@@ -225,7 +227,6 @@ export async function POST(request: NextRequest) {
     try {
       const nurseTenant = await prisma.tenant.create({
         data: {
-          id: randomUUID(),
           slug: 'enfermeria-cuidados',
           businessName: 'Enfermería Cuidados del Hogar',
           legalName: 'Enfermería Cuidados del Hogar',
@@ -244,7 +245,6 @@ export async function POST(request: NextRequest) {
 
       await prisma.systemUser.create({
         data: {
-          id: randomUUID(),
           email: 'nurse@aethel.tt',
           name: 'María Rodríguez',
           passwordHash: demoPasswordHash,
@@ -263,7 +263,6 @@ export async function POST(request: NextRequest) {
       where: { key: 'company_name' },
       update: { value: 'AETHEL OS' },
       create: {
-        id: randomUUID(),
         key: 'company_name',
         value: 'AETHEL OS',
         description: 'Company name displayed in the system',
@@ -275,7 +274,6 @@ export async function POST(request: NextRequest) {
       where: { key: 'support_email' },
       update: { value: 'soporte@aethel.tt' },
       create: {
-        id: randomUUID(),
         key: 'support_email',
         value: 'soporte@aethel.tt',
         description: 'Support email address',

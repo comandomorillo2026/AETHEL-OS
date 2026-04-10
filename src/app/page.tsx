@@ -527,24 +527,36 @@ function LoginModal({ onClose, language, theme, t }: {
     setLoading(true);
     setError('');
     
-    setTimeout(() => {
-      if (email === 'admin@nexusos.tt' && password === 'admin123') {
-        window.location.href = '/admin';
-      } else if (email === 'clinic@demo.tt' && password === 'demo123') {
-        window.location.href = '/clinic';
-      } else if (email === 'lawfirm@demo.tt' && password === 'demo123') {
-        window.location.href = '/lawfirm';
-      } else if (email === 'beauty@demo.tt' && password === 'demo123') {
-        window.location.href = '/beauty';
-      } else if (email === 'nurse@demo.tt' && password === 'demo123') {
-        window.location.href = '/nurse';
-      } else if (email === 'bakery@demo.tt' && password === 'demo123') {
-        window.location.href = '/bakery';
+    try {
+      // Call the real API endpoint
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+
+      if (data.success && data.user) {
+        // Store user in localStorage for session persistence
+        localStorage.setItem('nexus_user', JSON.stringify(data.user));
+        
+        // Redirect based on user role
+        if (data.redirectPath) {
+          window.location.href = data.redirectPath;
+        } else if (data.user.role === 'SUPER_ADMIN' || data.user.role === 'ADMIN') {
+          window.location.href = '/admin';
+        } else {
+          window.location.href = '/clinic';
+        }
       } else {
-        setError(t.wrongCredentials);
+        setError(data.error || t.wrongCredentials);
+        setLoading(false);
       }
+    } catch (err) {
+      setError(language === 'es' ? 'Error de conexión. Intenta de nuevo.' : 'Connection error. Please try again.');
       setLoading(false);
-    }, 1000);
+    }
   };
 
   return (

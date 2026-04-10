@@ -62,17 +62,35 @@ function getClientIP(req: NextRequest): string {
 }
 
 // ============================================================================
-// LEER COOKIE nexus_token (reemplaza NextAuth)
+// LEER COOKIE de sesión (soporta tanto nexus_token como aethel_session)
 // ============================================================================
 
 function getUserFromCookie(req: NextRequest) {
-  const token = req.cookies.get('nexus_token')?.value;
-  if (!token) return null;
-  try {
-    return JSON.parse(atob(token));
-  } catch {
-    return null;
+  // Try nexus_token first (legacy)
+  const nexusToken = req.cookies.get('nexus_token')?.value;
+  if (nexusToken) {
+    try {
+      return JSON.parse(atob(nexusToken));
+    } catch {
+      // Continue to check other cookies
+    }
   }
+  
+  // Try aethel_user_id cookie
+  const aethelUserId = req.cookies.get('aethel_user_id')?.value;
+  const aethelSession = req.cookies.get('aethel_session')?.value;
+  
+  if (aethelUserId && aethelSession) {
+    // Session exists, return a minimal user object
+    // The actual user validation happens in API routes
+    return {
+      id: aethelUserId,
+      sessionToken: aethelSession,
+      role: 'USER', // Will be properly validated in protected routes
+    };
+  }
+  
+  return null;
 }
 
 // ============================================================================
